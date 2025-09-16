@@ -15,9 +15,20 @@ function Register() {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [rtpassword, setRetypePassword] = useState("")
+  const [faceScanBytes, setFaceScanBytes] = useState<File | null>(null);
+  const [profilePhotoBytes, setProfilePhotoBytes] = useState<File | null>(null);
 
   const [message,setMessage] = useState("")
   //var message = "";
+
+
+const handleFileChange = (
+  event: React.ChangeEvent<HTMLInputElement>,
+  setFile: React.Dispatch<React.SetStateAction<File | null>>
+) => {
+  const file = event.target.files?.[0];
+  if (file) setFile(file);
+};
 
   //HandleSubmit
 
@@ -29,8 +40,17 @@ function Register() {
       {
         if(password == rtpassword)
           {
-            const data = {email,username,password} //Salt password here
-            console.log(data)
+           await fetch("http://localhost:3000/api/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              userEmail: email,
+              userUsername:username,
+              userPassword:password,
+              imageFace: faceScanBytes, 
+              profilePhoto: profilePhotoBytes,
+            }),
+    });
             setMessage("Registration successful!")
             setTimeout(() => {
               navigate("/login") //Navigate to login after successful registration
@@ -82,8 +102,12 @@ function Register() {
           <input id='retypepassword' value={rtpassword} type='password' placeholder='Retype password' onChange={e => {setRetypePassword(e.target.value)}}/>
         </div>
         <div>
-          <label htmlFor="facescan">Scan your face</label> 
-          <input id='facescan' type='file' accept="image/*"/>
+          <label htmlFor="facescan">Upload Photo of Face</label> 
+          <input id='facescan' type='file' accept="image/*" onChange={(e) => handleFileChange(e, setFaceScanBytes)}/>
+        </div>
+        <div>
+          <label htmlFor="profilephoto">Upload Profile Photo</label> 
+          <input id='profilephoto' type='file' accept="image/*" onChange={(e) => handleFileChange(e, setProfilePhotoBytes)}/>
         </div>
 
         <button className='btn btn-primary' type='submit'>Submit</button>
