@@ -16,12 +16,30 @@ const HandleSubmit = async (e:React.FormEvent)=>
   {
     e.preventDefault()
 
-    if(email != "" && password!=""){
-        const data = {email,password}     
-        console.log(data)
-        
-        setUserID(24)
+    if(email != "" && password!=""){    
+        //console.log(email)
+        try {
+            const result = await fetch("http://localhost:3000/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userEmail: email, userPassword: password }),
+    });
+
+        const data = await result.json();
+        console.log("Login response:", data);
+        } catch (error) {
+          console.error("Error logging in:", error);
+        }
+        const res = await fetch(`http://localhost:3000/api/getUserID?userEmail=${encodeURIComponent(email)}`);
+        const data = await res.json()
+        const userid = Number(data.userId);
+
+
+        setUserID(userid)
         setLoggedIn(true)
+        localStorage.setItem("userID", userid.toString());
         navigate("/user")
     }
   }
@@ -36,14 +54,12 @@ const HandleSubmit = async (e:React.FormEvent)=>
       <hr/>
 
       <form onSubmit={HandleSubmit}>
-        <div>
-          <label htmlFor="email">Email Address</label> 
-          <input id='email' value = {email} type='email' placeholder='Enter your email address' onChange={e => {setEmail(e.target.value)}}/>
-        </div>
-
-        <div>
-          <label htmlFor="password">Password</label> 
-          <input id='password' value = {password} type='password' placeholder='Enter your password' onChange={e => {setPassword(e.target.value)}}/>
+        <div className="form-group">
+          <label htmlFor="email" className='form-label'>Email Address</label> 
+          <input id='email' value = {email} type='email' className='form-control' placeholder='Enter your email address' onChange={e => {setEmail(e.target.value)}}/>
+          
+          <label htmlFor="password" className='form-label'>Password</label> 
+          <input id='password' value = {password} type='password' className='form-control' placeholder='Enter your password' onChange={e => {setPassword(e.target.value)}}/>
         </div>
 
 

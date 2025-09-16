@@ -2,9 +2,9 @@ import { useEffect,useState } from 'react'
 import { useNavigate } from "react-router-dom"
 
 type LogoutProps = {
-  userId: number
+  userId: number | null;
   setLoggedIn: (value: boolean) => void
-  setUserID: (id: number) => void
+  setUserID: (id: number | null) => void
 }
 
 function LogOut({ userId,setLoggedIn,setUserID }: LogoutProps)
@@ -13,7 +13,8 @@ function LogOut({ userId,setLoggedIn,setUserID }: LogoutProps)
         useEffect(() => {
     document.title = "Tagstrike - Logout"
     setLoggedIn(false)
-    setUserID(0)
+    setUserID(null)
+    localStorage.removeItem("userID");
     navigate("/")
   }, [])
     return(

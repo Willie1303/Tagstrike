@@ -10,8 +10,9 @@ function Home(){
             <p>
 
             Welcome to Tagstrike!
-
+            
             </p>
+            <button>Watch match as a <strong>Spectator</strong></button>
       </div>
     )
 }
