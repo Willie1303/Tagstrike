@@ -7,12 +7,12 @@ function Home(){
     return(
         <div>
             <h1>Tagstrike</h1>
-            <p>
+            <p className="brand-color-matrix">
 
             Welcome to Tagstrike!
             
             </p>
-            <button>Watch match as a <strong>Spectator</strong></button>
+            <button className="brand-color-matrix">Watch match as a <strong>Spectator</strong></button>
       </div>
     )
 }

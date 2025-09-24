@@ -2,6 +2,8 @@
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom"
 import { Navbar, Nav, Container } from "react-bootstrap"
 import { useEffect, useState } from 'react'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHome, faSignIn, faSignOut, faRegistered } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom"
 import Register from './pages/Register'
 import Home from './pages/Home'
@@ -13,6 +15,7 @@ import Match from "./pages/Match"
 //import tsLogo from '/TS_matrix.png'
 import './App.css'
 import CreateMatch from "./components/CreateMatch"
+import MatchStart from "./pages/MatchStart";
 
 function App() {
 
@@ -44,26 +47,26 @@ function App() {
   return (
     <Router>
       <div className="app-wrapper">
-      <Navbar bg="dark" variant="dark" expand="lg">
-        <Container fluid>
-          <Navbar.Brand as={Link} to="/">Tagstrike</Navbar.Brand>
+      <Navbar bg="dark" expand="lg" className="brand-color-matrix-navbar">
+        <Container fluid className="brand-color-matrix-navbar">
+          <Navbar.Brand className="brand-color-matrix" as={Link} to="/">Tagstrike</Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
               
               {!loggedin && (
                 <>
-                  <Nav.Link as={Link} to="/">Home</Nav.Link>
-                  <Nav.Link as={Link} to="/register">Register</Nav.Link>
-                  <Nav.Link as={Link} to="/login">Login</Nav.Link>
+                  <Nav.Link className="brand-color-matrix" as={Link} to="/">Home <FontAwesomeIcon icon={faHome} /></Nav.Link>
+                  <Nav.Link className="brand-color-matrix" as={Link} to="/register">Register <FontAwesomeIcon icon={faRegistered} /></Nav.Link>
+                  <Nav.Link className="brand-color-matrix" as={Link} to="/login">Login <FontAwesomeIcon icon={faSignIn} /></Nav.Link>
                 </>
               )}
               {loggedin && (
                 <>
                   <input id ="user_id" type="text" hidden />
                   
-                  <Nav.Link as={Link} to="/user">Home</Nav.Link>
-                  <Nav.Link as={Link} to="/logout">Log out</Nav.Link>
+                  <Nav.Link className="brand-color-matrix" as={Link} to="/user">Home <FontAwesomeIcon icon={faHome} /></Nav.Link>
+                  <Nav.Link className="brand-color-matrix" as={Link} to="/logout">Log out <FontAwesomeIcon icon={faSignOut}/> </Nav.Link>
                 </>
               )}
               
@@ -81,6 +84,7 @@ function App() {
         <Route path="/user" element={<User userId = {UserID}/>}></Route>
         <Route path="/createMatch" element={<CreateMatch userId = {UserID}/>}></Route>
         <Route path="/match" element={<Match/>}></Route>
+        <Route path="/matchstart" element={<MatchStart/>}></Route>
 
       </Routes>
       </Container>

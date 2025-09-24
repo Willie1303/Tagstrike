@@ -1,16 +1,13 @@
 import { useEffect,useState } from 'react'
 import { useNavigate,useLocation  } from "react-router-dom"
 import { Table, Container } from "react-bootstrap";
+import CameraFeed from '../components/CameraFeed';
+import MatchStatistics from '../components/MatchStatistics';
 
 type MatchProps = {
   matchId: number | null
   matchLobbyID :string |null
   currentPlayerId: number | null
-}
-
-interface PlayerStatus {
-  UserUsername: string;
-  player_ready: boolean;
 }
 
 function Match(){
@@ -20,34 +17,15 @@ function Match(){
     const [PlayerReadyText,setPlayerReadyText] = useState("Not ready")
     const [MatchLobbyID, setMatchLobbyID] = useState(matchLobbyID)
     const [CurrentPlayerID, setCurrentPlayerId] = useState(currentPlayerId)
+    const [PlayerUsername, setPlayerUsername] = useState("Default")
+    const [PlayerScore, setPlayerScore] = useState<number>(0)
+    const [PlayerHealth, setPlayerHealth] = useState<number>(100)
 
-    const [AllPlayerStatuses,setAllPlayerStatuses]= useState<PlayerStatus[]>([])
-    //Match Voting Ready
-
-const HandleToggleReady = async () => {
-  const newStatus = !PlayerReady; // compute opposite of current state
-
-  setPlayerReady(newStatus);
-  setPlayerReadyText(newStatus ? "Ready" : "Not ready");
-  try {
-    const result = await fetch(`http://localhost:3000/api/updatePlayerStatus`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ 
-        playerID: CurrentPlayerID,
-        playerStatus: newStatus, 
-        matchID:matchId }), // 
-    });
-   if (!result.ok) {
-      const text = await result.text(); // debug raw response
-      console.error("Server error:", result.status, text);
-      return;
-    }
-    const data = await result.json();
-  } catch (err) {
-    console.error("Failed to update player status:", err);
-  }
-};
+    const players = [
+  { id: 1, username: "PlayerOne", health: 75, score: 1200, status: "Alive" },
+  { id: 2, username: "PlayerTwo", health: 40, score: 850, status: "Alive" },
+  { id: 3, username: "PlayerThree", health: 0, score: 600, status: "Eliminated" },
+];  
 
         //Match start
 
@@ -55,21 +33,16 @@ const HandleToggleReady = async () => {
 
 
     //Loading page
-        const players = ["Alice", "Bob", "Charlie"];
       useEffect(() => {
         const OnLoadMatchPage = async (matchProp: MatchProps) => {
 
           document.title = "Tagstrike - Match - "+matchProp.matchLobbyID;
-          setCurrentPlayerId(matchProp.currentPlayerId)
+          const res = await fetch(`http://localhost:3000/api/getUsername/${currentPlayerId}`);
+          const data = await res.json();
+          const username = data[0]?.UserUsername;
+          setPlayerUsername(username)
         };
         
-        const CheckMatchVoting = setInterval(async () => {
-              const response = await fetch(`http://localhost:3000/api/getMatchStatus/${matchId}`)
-              const data = await response.json()
-              setAllPlayerStatuses(data.match_status_players)
-        },250)
-
-    
       if (matchId !== null) { // <-- only call if matchID is valid
         OnLoadMatchPage({
             matchId,
@@ -77,37 +50,17 @@ const HandleToggleReady = async () => {
             currentPlayerId
         });
       }
-      return () => clearInterval(CheckMatchVoting);
       }, [matchId]);
 
     return(
         <>
-        <div>
-            <h3>Match Lobby: {MatchLobbyID ? MatchLobbyID : "Not Assigned"}</h3>
+        <div className="container mt-3">
+          <div className="mb-2">
+          <span className='brand-color-matrix'>{PlayerUsername} Health: {PlayerHealth.toString()} Score: {PlayerScore.toString()}</span>
+          <CameraFeed />
 
-            <hr/>
-
-            <p>{PlayerReadyText}</p><button onClick={HandleToggleReady}>Toggle Ready</button>
-
-            <hr />
-            <Container fluid>
-            <Table bordered variant="dark">
-              <thead>
-                <tr className='row'>
-                  <th className="col">Player</th>
-                  <th className="col">Player Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {AllPlayerStatuses.sort((a, b) => a.UserUsername.localeCompare(b.UserUsername)).map((player, index) => (
-                  <tr key={index} className='row'>
-                    <td className="col">{player.UserUsername}</td>
-                    <td className="col">{player.player_ready? "Ready" : "Not Ready"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-            </Container>
+          <MatchStatistics players={players}/>
+          </div>
         </div>
         </>
     )

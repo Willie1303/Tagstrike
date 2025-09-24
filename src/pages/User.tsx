@@ -1,4 +1,6 @@
 import { useEffect,useState } from 'react'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHammer,faPlus } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from "react-router-dom"
 
 type UserProps = {
@@ -44,7 +46,7 @@ function User({ userId }: UserProps)
 
     if(joined_match)
         {
-            navigate("/match",{ state: { matchId: Match_ID, matchLobbyID:LobbyID,currentPlayerId: userId} })
+            navigate("/matchstart",{ state: { matchId: Match_ID, matchLobbyID:LobbyID,currentPlayerId: userId} })
         }
     }
         //As a player
@@ -71,27 +73,27 @@ function User({ userId }: UserProps)
   }, [userId]);
     return(
         <div>
-            <p>Welcome {Username
+            <p className='brand-color-matrix'>Welcome {Username
              }</p> 
             <div>
                 <form onSubmit={HandleCreateMatchSubmit}>
-                  <button type='submit'>Create a Match</button>
+                  <button className='brand-color-matrix' type='submit'>Create a Match <FontAwesomeIcon icon={faHammer} /></button>
                 </form>
                 <form onSubmit={HandleJoinMatchSubmit}>
-                    <input id='lobbyid' type='text' className='form-control' placeholder='Enter lobby id you want to join' onChange={e=> {setLobbyID(e.target.value.toUpperCase())}}></input>
-                    <button type='submit'>Join Match</button>
+                    <input id='lobbyid'  type='text' className='form-control brand-color-matrix' placeholder='Enter lobby id you want to join' onChange={e=> {setLobbyID(e.target.value.toUpperCase())}}></input>
+                    <button className='brand-color-matrix' type='submit'>Join Match <FontAwesomeIcon icon={faPlus} /></button>
                 </form>
             </div>
             
-            <hr/>
+            <hr className='brand-color-matrix'/>
 
             <div>
                 <div>
-                  <p>Match Statistics</p>
+                  <p className='brand-color-matrix'>Match Statistics</p>
                 </div>
-                <hr/>
+                <hr className='brand-color-matrix'/>
                 <div>
-                  <p>Match History</p>
+                  <p className='brand-color-matrix'>Match History</p>
                 </div>
             </div>
         </div>

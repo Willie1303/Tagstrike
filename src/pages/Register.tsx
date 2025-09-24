@@ -10,12 +10,12 @@ function Register() {
   }, [])
 
   const navigate = useNavigate()
-  // Hooks for Email,Username, Password and Face Scan details
+  // Hooks for Email,Username, Password and profile photo details
   const [email,setEmail] = useState("")
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [rtpassword, setRetypePassword] = useState("")
-  const [faceScanBytes, setFaceScanBytes] = useState<File | null>(null);
+
   const [profilePhotoBytes, setProfilePhotoBytes] = useState<File | null>(null);
 
   const [message,setMessage] = useState("")
@@ -47,7 +47,6 @@ const handleFileChange = (
               userEmail: email,
               userUsername:username,
               userPassword:password,
-              imageFace: faceScanBytes, 
               profilePhoto: profilePhotoBytes,
             }),
     });
@@ -71,7 +70,7 @@ const handleFileChange = (
     return (
     <div>
       <h1>Register Page</h1>
-      <p>Please fill in your details.</p>
+      <p className="brand-color-matrix">Please fill in your details.</p>
       {message && (
         <Alert
           variant="info"
@@ -85,29 +84,21 @@ const handleFileChange = (
       <hr/>
 
       <form onSubmit={HandleSubmit}>
-        <div>
-          <label htmlFor="email">Email Address</label> 
-          <input id='email' value = {email} type='email' placeholder='Enter your email address' onChange={e => {setEmail(e.target.value)}}/>
-        </div>
-        <div>
-          <label htmlFor="username">Username</label> 
-          <input id='username' value = {username} type='text' placeholder='Enter your username' onChange={e => {setUsername(e.target.value)}}/>
-        </div>
-        <div>
-          <label htmlFor="password">Password</label> 
-          <input id='password' value = {password} type='password' placeholder='Type a new password' onChange={e => {setPassword(e.target.value)}}/>
-        </div>
-        <div>
-          <label htmlFor="retypepassword">Retype Password</label> 
-          <input id='retypepassword' value={rtpassword} type='password' placeholder='Retype password' onChange={e => {setRetypePassword(e.target.value)}}/>
-        </div>
-        <div>
-          <label htmlFor="facescan">Upload Photo of Face</label> 
-          <input id='facescan' type='file' accept="image/*" onChange={(e) => handleFileChange(e, setFaceScanBytes)}/>
-        </div>
-        <div>
-          <label htmlFor="profilephoto">Upload Profile Photo</label> 
-          <input id='profilephoto' type='file' accept="image/*" onChange={(e) => handleFileChange(e, setProfilePhotoBytes)}/>
+        <div className="form-group">
+          <label htmlFor="email" className="brand-color-matrix form-label">Email Address</label> 
+          <input id='email' className='form-control' value = {email} type='email' placeholder='Enter your email address' onChange={e => {setEmail(e.target.value)}}/>
+
+          <label htmlFor="username" className="brand-color-matrix form-label">Username</label> 
+          <input id='username' className='form-control' value = {username} type='text' placeholder='Enter your username' onChange={e => {setUsername(e.target.value)}}/>
+
+          <label htmlFor="password" className="brand-color-matrix form-label">Password</label> 
+          <input id='password' className='form-control' value = {password} type='password' placeholder='Type a new password' onChange={e => {setPassword(e.target.value)}}/>
+
+          <label htmlFor="retypepassword" className="brand-color-matrix form-label">Retype Password</label> 
+          <input id='retypepassword' className='form-control' value={rtpassword} type='password' placeholder='Retype password' onChange={e => {setRetypePassword(e.target.value)}}/>
+
+          <label htmlFor="profilephoto" className="brand-color-matrix form-label">Upload Profile Photo</label> 
+          <input id='profilephoto' className='form-control' type='file' accept="image/*" onChange={(e) => handleFileChange(e, setProfilePhotoBytes)}/>
         </div>
 
         <button className='btn btn-primary' type='submit'>Submit</button>

@@ -18,11 +18,8 @@ async function hashPassword(plainPassword: string) {
 }
 
 const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: Number(process.env.DB_PORT),
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
 });
 
 app.use(cors())
@@ -223,3 +220,31 @@ app.get("/api/getMatchStatus/:matchID",async(req,res)=>
   }
     })
 //Match Actions
+
+
+app.post("/api/hitplayer", async (req, res)=>
+  {
+    const {playerID,matchID,playershotid} = req.body
+    try
+    {
+      var result = await pool.query('SELECT player_health FROM "Player" WHERE user_id = $1 AND match_id = $2',[playershotid,matchID]);
+      const playerShotHealth = result.rows[0].player_health;
+      const value = 10;
+      if( playerShotHealth >10)
+      {
+        //Player shot
+        result = await pool.query('UPDATE "Player" SET player_health = $3 WHERE user_id = $1 AND  match_id = $2',[playershotid,matchID,playerShotHealth-value])
+        
+        result = await pool.query('UPDATE "Player" SET player_health = $3 WHERE user_id = $1 AND  match_id = $2',[playershotid,matchID,playerShotHealth-value])
+
+      }else
+      { //Player 'killed'
+        //Add hit to playeractions
+        result = await pool.query('UPDATE "Player" SET player_health = $3 WHERE user_id = $1 AND  match_id = $2',[playershotid,matchID,0])
+      }
+    } 
+    catch(err)
+    {
+
+    }
+  })
