@@ -229,18 +229,25 @@ app.post("/api/hitplayer", async (req, res)=>
     {
       var result = await pool.query('SELECT player_health FROM "Player" WHERE user_id = $1 AND match_id = $2',[playershotid,matchID]);
       const playerShotHealth = result.rows[0].player_health;
+      result = await pool.query('SELECT player_score FROM "Player" WHERE user_id = $1 AND match_id = $2',[playerID,matchID]);
+      const playerScore = result.rows[0].player_health;
       const value = 10;
       if( playerShotHealth >10)
       {
         //Player shot
         result = await pool.query('UPDATE "Player" SET player_health = $3 WHERE user_id = $1 AND  match_id = $2',[playershotid,matchID,playerShotHealth-value])
         
-        result = await pool.query('UPDATE "Player" SET player_health = $3 WHERE user_id = $1 AND  match_id = $2',[playershotid,matchID,playerShotHealth-value])
+        result = await pool.query('INSERT INTO "MatchAction"(match_id,user_id,action_type,action_2nd_player,action_type_value) VALUES ($1,$2,"hit",$3,$4)',[matchID,playerID,playershotid,value])
+        result = await pool.query('UPDATE "Player" SET player_score = $3 WHERE user_id = $1 AND  match_id = $2',[playerID,matchID,playerScore+value])
+
 
       }else
       { //Player 'killed'
         //Add hit to playeractions
         result = await pool.query('UPDATE "Player" SET player_health = $3 WHERE user_id = $1 AND  match_id = $2',[playershotid,matchID,0])
+        result = await pool.query('INSERT INTO "MatchAction"(match_id,user_id,action_type,action_2nd_player,action_type_value) VALUES ($1,$2,"hit",$3,$4)',[matchID,playerID,playershotid,value])
+        result = await pool.query('INSERT INTO "MatchAction"(match_id,user_id,action_type,action_2nd_player,action_type_value) VALUES ($1,$2,"kill",$3,$4)',[matchID,playerID,playershotid,null])
+        result = await pool.query('UPDATE "Player" SET player_score = $3 WHERE user_id = $1 AND  match_id = $2',[playerID,matchID,playerScore+value])
       }
     } 
     catch(err)
@@ -248,3 +255,53 @@ app.post("/api/hitplayer", async (req, res)=>
 
     }
   })
+
+app.get("/api/getStatistics", async (req, res) => {
+  const matchID = req.query.matchID;
+
+  try {
+    const result = await pool.query(
+      'SELECT user_id FROM "Player" WHERE match_id = $1',
+      [matchID]
+    );
+
+    const Players = await Promise.all(
+      result.rows.map(async (row) => {
+        const player: { username:string;kills: number; score: number, alive:boolean } = {
+          username :"",
+          kills: 0,
+          score: 0,
+          alive:true
+        };
+
+      const resUsername = await pool.query('SELECT "UserUsername" FROM "User" where "UserID" = $1',[row.user_id]);
+      player.username = resUsername.rows[0].UserUsername;
+
+        const resKills = await pool.query(
+          'SELECT COUNT(*) AS "Kills" FROM "MatchAction" WHERE match_id = $1 AND user_id = $2 AND action_type = $3',
+          [matchID, row.user_id, "kill"]
+        );
+        player.kills = Number(resKills.rows[0].Kills);
+
+        const resScore = await pool.query(
+          'SELECT player_score FROM "Player" WHERE match_id = $1 AND user_id = $2',
+          [matchID, row.user_id]
+        );
+        player.score = Number(resScore.rows[0].player_score);
+
+        const resAlive = await pool.query(
+          'SELECT (COUNT(*)=0) AS "Alive" FROM "MatchAction" WHERE match_id = $1 AND action_2nd_player = $2 AND action_type = $3',
+          [matchID, row.user_id,"kill"]
+        );
+        player.alive = resAlive.rows[0].Alive;
+
+        return player;
+      })
+    );
+
+    res.json(Players);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Database error");
+  }
+});

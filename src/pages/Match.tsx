@@ -10,6 +10,13 @@ type MatchProps = {
   currentPlayerId: number | null
 }
 
+type PlayerStats = {
+  username:string;
+  kills: number;
+  score: number;
+  alive: boolean;
+};
+
 function Match(){
   const location = useLocation();
   const { matchId, matchLobbyID, currentPlayerId } = location.state ?? {};  
@@ -20,12 +27,7 @@ function Match(){
     const [PlayerUsername, setPlayerUsername] = useState("Default")
     const [PlayerScore, setPlayerScore] = useState<number>(0)
     const [PlayerHealth, setPlayerHealth] = useState<number>(100)
-
-    const players = [
-  { id: 1, username: "PlayerOne", health: 75, score: 1200, status: "Alive" },
-  { id: 2, username: "PlayerTwo", health: 40, score: 850, status: "Alive" },
-  { id: 3, username: "PlayerThree", health: 0, score: 600, status: "Eliminated" },
-];  
+    const [players, setPlayers] = useState<PlayerStats[]>([]);
 
         //Match start
 
@@ -51,6 +53,30 @@ function Match(){
         });
       }
       }, [matchId]);
+
+    useEffect(() => {
+      if (matchId === null) return;
+
+      const fetchMatchStats = async () => {
+        try {
+          // GET request with query param
+          const res = await fetch(`http://localhost:3000/api/getStatistics?matchID=${matchId}`);
+
+          if (!res.ok) throw new Error("Failed to fetch match statistics");
+
+          const data: PlayerStats[] = await res.json();
+          setPlayers(data); // updates your players state
+        } catch (err) {
+          console.error(err);
+        }
+      };
+
+      fetchMatchStats();
+
+      const interval = setInterval(fetchMatchStats, 200);
+
+      return () => clearInterval(interval); // cleanup on unmount
+    }, [matchId]);
 
     return(
         <>

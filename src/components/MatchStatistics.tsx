@@ -2,12 +2,11 @@ import React, { useState } from "react";
 import { Button, Collapse, Container } from "react-bootstrap";
 
 interface Player {
-  id: number;
-  username: string;
-  health: number;
+  username:string;
+  kills: number;
   score: number;
-  status: string;
-}
+  alive: boolean;
+};
 
 interface MatchStatisticsProps {
   players: Player[];
@@ -30,12 +29,12 @@ const MatchStatistics: React.FC<MatchStatisticsProps> = ({ players }) => {
 
       <Collapse in={open}>
         <div id="stats-table">
-          {players.map((player) => (
-            <div key={player.id} className="matrix-card">
+          {players.map((player,index) => (
+            <div key={index} className="matrix-card">
               <div><strong>{player.username}</strong></div>
-              <div>Health: {player.health}</div>
+              <div>Kills: {player.kills}</div>
               <div>Score: {player.score}</div>
-              <div>Status: {player.status}</div>
+              <div>Status: {player.alive?"Alive":"Dead"}</div>
             </div>
           ))}
         </div>
