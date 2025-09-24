@@ -1,12 +1,13 @@
-import { useEffect } from 'react'
+import { useEffect } from 'react' //UseEffect to make changes on loading page
 
 function Home(){
     useEffect(() => {
-    document.title = "Tagstrike - Home"
+    document.title = "Tagstrike - Home" //Change title in tab to "Tagstrike - Home"
   }, [])
     return(
         <div>
-            <h1>Tagstrike</h1>
+            <h1>Tagstrike</h1> {// Heading for tagstrike
+            }
             <p className="brand-color-matrix">
 
             Welcome to Tagstrike!
@@ -17,4 +18,4 @@ function Home(){
     )
 }
 
-export default Home
+export default Home //Export component as "Home"
