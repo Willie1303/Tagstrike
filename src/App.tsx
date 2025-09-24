@@ -16,6 +16,7 @@ import Match from "./pages/Match"
 import './App.css'
 import CreateMatch from "./components/CreateMatch"
 import MatchStart from "./pages/MatchStart";
+import WinnerScreen from "./components/WinnerScreen";
 
 function App() {
 
@@ -85,6 +86,7 @@ function App() {
         <Route path="/createMatch" element={<CreateMatch userId = {UserID}/>}></Route>
         <Route path="/match" element={<Match/>}></Route>
         <Route path="/matchstart" element={<MatchStart/>}></Route>
+        <Route path="/winner" element={<WinnerScreen />}></Route>
 
       </Routes>
       </Container>

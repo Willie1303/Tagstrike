@@ -28,6 +28,8 @@ function Match(){
     const [PlayerScore, setPlayerScore] = useState<number>(0)
     const [PlayerHealth, setPlayerHealth] = useState<number>(100)
     const [players, setPlayers] = useState<PlayerStats[]>([]);
+    const [timeLeft, setTimeLeft] = useState<number>(0)
+    const navigate = useNavigate();
 
         //Match start
 
@@ -54,35 +56,58 @@ function Match(){
       }
       }, [matchId]);
 
-    useEffect(() => {
-      if (matchId === null) return;
+useEffect(() => {
+  if (!matchId) return;
 
-      const fetchMatchStats = async () => {
-        try {
-          // GET request with query param
-          const res = await fetch(`http://localhost:3000/api/getStatistics?matchID=${matchId}`);
+  let intervalId: number;
 
-          if (!res.ok) throw new Error("Failed to fetch match statistics");
+  const updateMatch = async () => {
+    try {
+      const resStats = await fetch(`http://localhost:3000/api/getStatistics?matchID=${matchId}`);
+      const playersData: PlayerStats[] = await resStats.json();
+      setPlayers(playersData);
 
-          const data: PlayerStats[] = await res.json();
-          setPlayers(data); // updates your players state
-        } catch (err) {
-          console.error(err);
-        }
-      };
+      const alivePlayers = playersData.filter(p => p.alive);
 
-      fetchMatchStats();
+      if (alivePlayers.length === 1) {
+        clearInterval(intervalId);
+        navigate("/winner", { state: { winner: alivePlayers[0].username, user:currentPlayerId } });
+        return;
+      }
 
-      const interval = setInterval(fetchMatchStats, 200);
+      const resEnd = await fetch(`http://localhost:3000/api/getMatchEndTime?matchID=${matchId}`);
+      const { match_end_time } = await resEnd.json();
+      const endTime = new Date(match_end_time).getTime();
+      const now = Date.now();
+      const secondsLeft = Math.max(0, Math.floor((endTime - now) / 1000));
+      setTimeLeft(secondsLeft);
 
-      return () => clearInterval(interval); // cleanup on unmount
-    }, [matchId]);
+      if (secondsLeft === 0) {
+        clearInterval(intervalId);
+        const winner = alivePlayers.length === 1 ? alivePlayers[0].username : "No one (draw)";
+        navigate("/winner", { state: { winner } });
+      }
+
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  updateMatch();
+  intervalId = window.setInterval(updateMatch, 1000);
+
+  return () => clearInterval(intervalId);
+}, [matchId, navigate])
+
+
 
     return(
         <>
         <div className="container mt-3">
           <div className="mb-2">
+            
           <span className='brand-color-matrix'>{PlayerUsername} Health: {PlayerHealth.toString()} Score: {PlayerScore.toString()}</span>
+          <div>Time left: {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, "0")}</div>
           <CameraFeed />
 
           <MatchStatistics players={players}/>

@@ -221,7 +221,52 @@ app.get("/api/getMatchStatus/:matchID",async(req,res)=>
     })
 //Match Actions
 
+app.post("/api/StartMatch",async (req,res) =>
+  {
+    const {matchID} = req.body
 
+    var result = await pool.query('SELECT match_time_limit FROM "Match" where match_id = $1',[matchID])
+    const minutesToAdd = result.rows[0].match_time_limit
+
+    result = await pool.query(
+    `UPDATE "Match"
+    SET match_start_time = date_trunc('second', NOW()),
+        match_end_time   = date_trunc('second', NOW() + ($1 || ' minutes')::interval)
+    WHERE match_id = $2`,
+    [minutesToAdd, matchID]);
+
+  res.json({ match_started: true });
+  })
+
+  app.get("/api/getMatchFinished", async (req, res)=>
+    {
+      const matchID = req.query.matchID;
+      const result = await pool.query(
+        `SELECT * FROM "Match" WHERE match_id = $1 AND NOW() >= match_end_time`,
+        [matchID]
+      );
+
+      if (result.rows.length > 0) {
+        res.json({ match_finished: true });
+      }
+      else
+        {
+          res.json({ match_finished: false });
+        }
+    });
+app.get("/api/getMatchEndTime", async (req, res) => {
+  const matchID = req.query.matchID;
+  const result = await pool.query(
+    `SELECT match_end_time FROM "Match" WHERE match_id = $1`,
+    [matchID]
+  );
+
+  if (result.rows.length > 0) {
+    res.json({ match_end_time: result.rows[0].match_end_time });
+  } else {
+    res.status(404).json({ error: "Match not found" });
+  }
+});
 app.post("/api/hitplayer", async (req, res)=>
   {
     const {playerID,matchID,playershotid} = req.body
