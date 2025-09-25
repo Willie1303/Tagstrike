@@ -1,7 +1,7 @@
 
-import { useEffect,useState } from 'react'
-import { useNavigate } from "react-router-dom"
-import { Alert } from 'react-bootstrap'
+import { useEffect,useState } from 'react' //useEffect to make changes on loading page //useState for react hooks for dynamic changes to variables
+import { useNavigate } from "react-router-dom" //useNavigate is used to navigate between pages
+import { Alert } from 'react-bootstrap' //Using alert component from react-boostrap
 
 function Register() {
 
@@ -9,60 +9,58 @@ function Register() {
     document.title = "Tagstrike - Register" //Assign title of home page
   }, [])
 
-  const navigate = useNavigate()
-  // Hooks for Email,Username, Password and Face Scan details
-  const [email,setEmail] = useState("")
-  const [username, setUsername] = useState("")
-  const [password, setPassword] = useState("")
-  const [rtpassword, setRetypePassword] = useState("")
-  const [faceScanBytes, setFaceScanBytes] = useState<File | null>(null);
-  const [profilePhotoBytes, setProfilePhotoBytes] = useState<File | null>(null);
+  const navigate = useNavigate() //Creation of useNavigate() object
 
-  const [message,setMessage] = useState("")
-  //var message = "";
+  const [email,setEmail] = useState("") //React hook for setting email
+  const [username, setUsername] = useState("") //React hook for setting username
+  const [password, setPassword] = useState("") //React hook for setting password
+  const [rtpassword, setRetypePassword] = useState("") //React hook for setting retpying password to check if user typed in their password correctly
+
+  const [profilePhotoBytes, setProfilePhotoBytes] = useState<File | null>(null);//React hook for setting email
+
+  const [message,setMessage] = useState("") //React hook for setting email
 
 
-const handleFileChange = (
+const handleFileChange = ( // Anonymous function to handle profile photo changes
   event: React.ChangeEvent<HTMLInputElement>,
   setFile: React.Dispatch<React.SetStateAction<File | null>>
 ) => {
   const file = event.target.files?.[0];
-  if (file) setFile(file);
+  if (file) setFile(file); //Sets file to new file
 };
 
   //HandleSubmit
 
-  const HandleSubmit = async (e:React.FormEvent)=>
+  const HandleSubmit = async (e:React.FormEvent)=> //Function that handles submit of the register form
   {
-    e.preventDefault()
+    e.preventDefault() //prevents default
 
-    if(email != "" && username !="" && password!=""&& rtpassword!="")
+    if(email != "" && username !="" && password!=""&& rtpassword!="") // if all entries are non empty
       {
-        if(password == rtpassword)
+        if(password == rtpassword) //If password and retyped password are a match
           {
-           await fetch("http://localhost:3000/api/register", {
+           await fetch("http://localhost:3000/api/register", { //Send a POST request to register the user
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               userEmail: email,
               userUsername:username,
               userPassword:password,
-              imageFace: faceScanBytes, 
               profilePhoto: profilePhotoBytes,
             }),
     });
-            setMessage("Registration successful!")
+            setMessage("Registration successful!") //Set registration successful
             setTimeout(() => {
               navigate("/login") //Navigate to login after successful registration
             }, 1000)
           }
           else{
-            setMessage("Passwords do not match")
+            setMessage("Passwords do not match") //Use alert to show the user that passwords do not match
             console.log(message)
           }
       }
       else{
-        setMessage("There are empty fields")
+        setMessage("There are empty fields") //Use alert to show the user that there are empty fields
 
         console.log(message)
     }
@@ -70,10 +68,11 @@ const handleFileChange = (
   }
     return (
     <div>
-      <h1>Register Page</h1>
-      <p>Please fill in your details.</p>
+      <h1>Register Page</h1> {/* Register page heading */}
+      <p className="brand-color-matrix">Please fill in your details.</p> {/* User must fill in their details */}
+      {/* Alert component that is used when a message needs to be sent to the user */}
       {message && (
-        <Alert
+        <Alert 
           variant="info"
           dismissible
           onClose={() => setMessage("")}
@@ -82,39 +81,31 @@ const handleFileChange = (
           {message}
         </Alert>
       )}
-      <hr/>
+      <hr/>{/* Linebreak */}
 
-      <form onSubmit={HandleSubmit}>
-        <div>
-          <label htmlFor="email">Email Address</label> 
-          <input id='email' value = {email} type='email' placeholder='Enter your email address' onChange={e => {setEmail(e.target.value)}}/>
-        </div>
-        <div>
-          <label htmlFor="username">Username</label> 
-          <input id='username' value = {username} type='text' placeholder='Enter your username' onChange={e => {setUsername(e.target.value)}}/>
-        </div>
-        <div>
-          <label htmlFor="password">Password</label> 
-          <input id='password' value = {password} type='password' placeholder='Type a new password' onChange={e => {setPassword(e.target.value)}}/>
-        </div>
-        <div>
-          <label htmlFor="retypepassword">Retype Password</label> 
-          <input id='retypepassword' value={rtpassword} type='password' placeholder='Retype password' onChange={e => {setRetypePassword(e.target.value)}}/>
-        </div>
-        <div>
-          <label htmlFor="facescan">Upload Photo of Face</label> 
-          <input id='facescan' type='file' accept="image/*" onChange={(e) => handleFileChange(e, setFaceScanBytes)}/>
-        </div>
-        <div>
-          <label htmlFor="profilephoto">Upload Profile Photo</label> 
-          <input id='profilephoto' type='file' accept="image/*" onChange={(e) => handleFileChange(e, setProfilePhotoBytes)}/>
+      <form onSubmit={HandleSubmit}> {/* Form where the user submits their registration details */}
+        <div className="form-group">
+          <label htmlFor="email" className="brand-color-matrix form-label">Email Address</label>  {/* Label for email address */}
+          <input id='email' className='form-control' value = {email} type='email' placeholder='Enter your email address' onChange={e => {setEmail(e.target.value)}}/> {/* Label for email address */}
+
+          <label htmlFor="username" className="brand-color-matrix form-label">Username</label>  {/* Label for username */}
+          <input id='username' className='form-control' value = {username} type='text' placeholder='Enter your username' onChange={e => {setUsername(e.target.value)}}/> {/* Label for username */}
+
+          <label htmlFor="password" className="brand-color-matrix form-label">Password</label> {/* Label for password */}
+          <input id='password' className='form-control' value = {password} type='password' placeholder='Type a new password' onChange={e => {setPassword(e.target.value)}}/> {/* Label for password */}
+
+          <label htmlFor="retypepassword" className="brand-color-matrix form-label">Retype Password</label> {/* Label for retype password */}
+          <input id='retypepassword' className='form-control' value={rtpassword} type='password' placeholder='Retype password' onChange={e => {setRetypePassword(e.target.value)}}/> {/* Label for retype password */}
+
+          <label htmlFor="profilephoto" className="brand-color-matrix form-label">Upload Profile Photo</label> {/* Label for profile photo */}
+          <input id='profilephoto' className='form-control' type='file' accept="image/*" onChange={(e) => handleFileChange(e, setProfilePhotoBytes)}/>{/* Label for profile photo */}
         </div>
 
-        <button className='btn btn-primary' type='submit'>Submit</button>
+        <button className='btn btn-primary' type='submit'>Submit</button> {/* Button for submitting registration details */}
       </form>
 
     </div>
   )
 }
 
-export default Register
+export default Register //Export component as "Registration"

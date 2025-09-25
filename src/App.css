@@ -5,6 +5,18 @@
   text-align: center;
 }
 
+.brand-color-matrix
+{
+  color: #08CB00;
+}
+
+
+.brand-color-matrix-navbar
+{
+  color: #08CB00;
+  background-color: black;
+}
+
 h1 {
   color: #08CB00;
   font-size: 3.2em;
@@ -43,4 +55,53 @@ h1 {
   flex: 1;
   display: flex;
   flex-direction: column;
+}
+
+
+/* Matrix-style green text */
+.brand-color-matrix {
+  color: #08CB00;       /* bright green */
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: bold;
+  text-shadow: 0 0 5px #08CB00, 0 0 10px #08CB00, 0 0 20px #08CB00;
+}
+
+/* Black background container */
+.matrix-container {
+  background-color: #000;  /* pure black */
+  padding: 20px;
+  border-radius: 12px;      /* rounded corners */
+  box-shadow: 0 0 15px #08CB00;
+}
+
+/* Optional: rounded cards for each player */
+.matrix-card {
+  background-color: #111;   /* very dark gray for contrast */
+  color: #08CB00;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+  box-shadow: 0 0 8px #08CB00;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: #08CB00;
+}
+
+.matrix-table th,
+.matrix-table td {
+  border: 1px solid #08CB00;
+  padding: 6px 12px;
+  text-align: center;
+}
+
+.matrix-table th {
+  background-color: #111;
+}
+
+.matrix-table td {
+  background-color: #000;
 }

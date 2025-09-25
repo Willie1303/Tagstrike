@@ -50,7 +50,7 @@ function CreateMatch({ userId }: UserProps)
 
     if(joined_match)
         {
-            navigate("/match",{ state: { matchId: Match_ID, matchLobbyID:LobbyID,currentPlayerId: userId} })
+            navigate("/matchstart",{ state: { matchId: Match_ID, matchLobbyID:LobbyID,currentPlayerId: userId} })
         }
 
 
@@ -65,13 +65,13 @@ function CreateMatch({ userId }: UserProps)
         <>
             <div>
                 <form onSubmit={HandleSubmitCreateMatch} className='form'>
-                    <input id="match_creator_id" type='text' value={MatchCreatorID} hidden></input>
-                    <label htmlFor='lobby_id' className='form-label'>Lobby ID:</label>
+                    <input id="match_creator_id"  type='text' value={MatchCreatorID} hidden></input>
+                    <label htmlFor='lobby_id' className='form-label brand-color-matrix'>Lobby ID:</label>
                     <input id="lobby_id" type='text' className='form-control' readOnly value={LobbyID} onChange={e => {setLobbyID(e.target.value)} }></input>
-                    <label htmlFor='match_time_limit' className='form-label'>Time Limit: {TimeLimit} minutes</label>
+                    <label htmlFor='match_time_limit' className='form-label brand-color-matrix'>Time Limit: {TimeLimit} minutes</label>
                     <input id="match_time_limit" type='range' className='form-range' min="3" max="30" value={TimeLimit} onChange={e => {setTimeLimit(Number(e.target.value))} }></input>
                     
-                    <button type='submit'>Create Match</button>
+                    <button className='brand-color-matrix' type='submit'>Create Match</button>
                 </form>
             </div> 
         </>
