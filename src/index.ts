@@ -164,7 +164,7 @@ app.post("/api/joinMatch",async(req,res)=>
 
     if(result.rows.length>0)
       {
-        return res.status(401).json({ error: "User is already in that match" });
+        res.json({ message: "User already in match",match_joined: true }); //Join match
       }
       else
         {
