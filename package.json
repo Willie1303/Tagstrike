@@ -4,10 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"ts-node src/index.ts\" \"vite\"",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+  "dev": "concurrently \"nodemon --watch src --ext ts --exec ts-node src/index.ts\" \"vite\"",
+  "build": "tsc -b && vite build",
+  "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+  "preview": "vite preview",
+  "start": "tsc -b tsconfig.node.json && node dist/index.js"
   },
   "dependencies": {
     "@fortawesome/free-brands-svg-icons": "^7.0.1",
