@@ -123,25 +123,26 @@ function MatchStart() {
       <button onClick={HandleToggleReady}>Toggle Ready</button> {/* Button to toggle readyness */}
       <hr />
       <Container fluid>
-        <Table bordered variant="dark"> {/* Table to display statuses of all players sorted to username */}
+        <Table bordered variant="dark">
           <thead>
-            <tr className='row'>
-              <th className="col">Player</th>
-              <th className="col">Player Status</th>
+            <tr>
+              <th>Player</th>
+              <th>Player Status</th>
             </tr>
           </thead>
           <tbody>
             {AllPlayerStatuses
               .sort((a, b) => a.UserUsername.localeCompare(b.UserUsername))
               .map((player, index) => (
-                <tr key={index} className='row'>
-                  <td className="col">{player.UserUsername}</td>
-                  <td className="col">{player.player_ready ? "Ready" : "Not Ready"}</td>
+                <tr key={index}>
+                  <td>{player.UserUsername}</td>
+                  <td>{player.player_ready ? "Ready" : "Not Ready"}</td>
                 </tr>
               ))
             }
           </tbody>
         </Table>
+
       </Container>
       {MatchBegin && (
         <div>

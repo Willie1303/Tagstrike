@@ -40,7 +40,7 @@ app.listen(PORT, () => {
 
   app.post("/api/register",async (req,res)=>{ //POST request to register a user
     
-    const { userEmail, userUsername,userPassword,profilePhoto } = req.body; //elements of body
+    const { userEmail, userUsername,userPassword } = req.body; //elements of body
     
     try { //try catch to insert new user
             var results = await pool.query('SELECT "UserUsername" FROM "User" where "UserEmail" = $1',[userEmail]); //Check if user with that email already exists
@@ -51,7 +51,8 @@ app.listen(PORT, () => {
               {
                 const hashedUserPassword = await hashPassword(userPassword) //Hash user password
 
-                results = await pool.query('INSERT INTO "User"("UserEmail","UserUsername","UserPassword","UserProfilePhoto") VALUES($1,$2,$3,$4) RETURNING "UserID"',[userEmail,userUsername,hashedUserPassword,profilePhoto]); //Store details of user
+                results = await pool.query('INSERT INTO "User"("UserEmail","UserUsername","UserPassword") VALUES($1,$2,$3) RETURNING "UserID"',[userEmail,userUsername,hashedUserPassword]); //Store details of user
+                res.status(200).json({ message: "Registration successful!", userId: results.rows[0].UserID });
               }
 
     } catch (error) {

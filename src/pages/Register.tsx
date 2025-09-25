@@ -39,20 +39,28 @@ const handleFileChange = ( // Anonymous function to handle profile photo changes
       {
         if(password == rtpassword) //If password and retyped password are a match
           {
-           await fetch("http://localhost:3000/api/register", { //Send a POST request to register the user
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              userEmail: email,
-              userUsername:username,
-              userPassword:password,
-              profilePhoto: profilePhotoBytes,
-            }),
-    });
-            setMessage("Registration successful!") //Set registration successful
-            setTimeout(() => {
-              navigate("/login") //Navigate to login after successful registration
-            }, 1000)
+           const response = await fetch("http://localhost:3000/api/register", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                userEmail: email,
+                userUsername: username,
+                userPassword: password,
+              }),
+            });
+
+            const data = await response.json();
+            const UserID = data.userId;
+            if (response.ok) {
+              setMessage("Registration successful!");
+              setTimeout(() => {
+                navigate("/login",{ 
+          state: { UserID} 
+        });
+              }, 1000);
+            } else {
+              setMessage(data.error || "Registration failed");
+            }
           }
           else{
             setMessage("Passwords do not match") //Use alert to show the user that passwords do not match

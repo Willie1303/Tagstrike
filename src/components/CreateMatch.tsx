@@ -1,13 +1,16 @@
 import { useEffect,useState } from 'react'
-import { useNavigate } from "react-router-dom"
+import { useNavigate,useLocation } from "react-router-dom"
 
 type UserProps = {
   userId: number | null
 }
 
-function CreateMatch({ userId }: UserProps)
+function CreateMatch()
 {
-    const MatchCreatorID = userId || 0;
+  const location = useLocation();
+  const state = location.state as { userId?: number } | undefined;
+  const userId = state?.userId ?? null;
+  const MatchCreatorID = userId || 0;
     const navigate = useNavigate()
     const [LobbyID,setLobbyID] = useState(Math.random().toString(36).slice(2).toUpperCase())
     const [TimeLimit,setTimeLimit] =useState(5)

@@ -82,8 +82,8 @@ function App() {
         <Route path='/register' element={<Register/>}></Route> {/* Route for register page*/}
         <Route path="/login" element={<Login setUserID={setUserID} setLoggedIn={setLoggedIn} />} /> {/* Route for login page*/}
         <Route path="/logout" element={<LogOut userId = {UserID} setLoggedIn={setLoggedIn} setUserID={setUserID}/>}></Route> {/* Route for logout page*/}
-        <Route path="/user" element={<User userId = {UserID}/>}></Route> {/* Route for user home page*/}
-        <Route path="/createMatch" element={<CreateMatch userId = {UserID}/>}></Route> {/* Route for create match page*/}
+        <Route path="/user" element={<User/>}></Route> {/* Route for user home page*/}
+        <Route path="/createMatch" element={<CreateMatch/>}></Route> {/* Route for create match page*/}
         <Route path="/match" element={<Match/>}></Route> {/* Route for match page*/}
         <Route path="/matchstart" element={<MatchStart/>}></Route> {/* Route for match start lobby page*/}
         <Route path="/winner" element={<WinnerScreen />}></Route> {/* Route for Winner screen page*/}
