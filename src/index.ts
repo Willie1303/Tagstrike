@@ -156,6 +156,49 @@ app.get("/api/getMatchID/:matchLobbyID",async (req,res)=>
         }
   })
 
+app.get("/api/getPlayerColour",async (req,res)=>
+  {
+    const {matchID, userID} = req.body
+
+    var result = await pool.query('SELECT player_colour from "Player" where user_id = $1 AND match_id = $2',[userID,matchID])
+
+    if(result.rows.length===0)
+      {
+        return res.status(401).json({ error: "No player with that matchid and userid" });
+      }
+      else
+        {
+          const player_colour = result.rows[0].player_colour;
+          res.json({ player_colour:player_colour });
+
+        }
+  })
+
+app.put("/api/setPlayerColour", async (req, res) => {
+  try {
+    const { matchID, userID, player_colour } = req.body;
+
+    if (!matchID || !userID || !player_colour) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    const result = await pool.query(
+      'UPDATE "Player" SET player_colour = $3 WHERE user_id = $1 AND match_id = $2',
+      [userID, matchID, player_colour]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ set_player_colour: false, message: "Player not found" });
+    }
+
+    res.json({ set_player_colour: true });
+  } catch (err) {
+    console.error("Error updating player colour:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
 app.post("/api/joinMatch",async(req,res)=>
   {
     const {matchID, userID} = req.body
