@@ -24,7 +24,10 @@ const pool = new Pool({ //Create pool to communicate with postgresql database on
   ssl: { rejectUnauthorized: false } //Makes sure that ssl does not reject unauthorised users (Players)
 });
 
-app.use(cors()) //Frontend and backend are seperated
+app.use(cors({
+  origin: "http://localhost:5173", // your Vite frontend
+  credentials: true
+})); //Frontend and backend are seperated
 app.use(express.json()) //app uses json
 
 app.use(bodyParser.json({ limit: "10mb" })) //Limit of body data size is change to 10 mb for more data to be sent over
@@ -36,6 +39,7 @@ app.listen(PORT, () => {
 });
 
   app.post("/api/register",async (req,res)=>{ //POST request to register a user
+    
     const { userEmail, userUsername,userPassword,profilePhoto } = req.body; //elements of body
     
     try { //try catch to insert new user
@@ -47,7 +51,7 @@ app.listen(PORT, () => {
               {
                 const hashedUserPassword = await hashPassword(userPassword) //Hash user password
 
-                results = await pool.query('INSERT INTO "User"("UserEmail","UserUsername","UserPassword","UserProfilePhoto") VALUES($1,$2,$3,$5) RETURNING "UserID"',[userEmail,userUsername,hashedUserPassword,profilePhoto]); //Store details of user
+                results = await pool.query('INSERT INTO "User"("UserEmail","UserUsername","UserPassword","UserProfilePhoto") VALUES($1,$2,$3,$4) RETURNING "UserID"',[userEmail,userUsername,hashedUserPassword,profilePhoto]); //Store details of user
               }
 
     } catch (error) {
@@ -56,6 +60,7 @@ app.listen(PORT, () => {
   })
   app.post("/api/login", async (req,res)=> //POST request to login a user
   {
+
     const { userEmail, userPassword } = req.body; //elements of body
 
     try {
