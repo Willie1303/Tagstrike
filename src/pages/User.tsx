@@ -1,18 +1,17 @@
 import { useEffect,useState } from 'react' //useEffect to make changes on loading page //useState for react hooks for dynamic changes to variables
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; //Import FontAwesome library to use icons
 import { faHammer,faPlus } from '@fortawesome/free-solid-svg-icons'; // Import selected icons
-import { useNavigate } from "react-router-dom" //useNavigate is used to navigate between pages
+import { useNavigate,useLocation } from "react-router-dom" //useNavigate is used to navigate between pages
 
 //UserProps to enfforce input of user id
-type UserProps = {
-  userId: number | null //UserID is either a value or noting
-}
 
 
 
-
-function User({ userId }: UserProps)
+function User()
 {
+    const location = useLocation();
+    const state = location.state as { userId?: number } | undefined;
+    const userId = state?.userId ?? null;
     const [Username,setUsername] = useState("") //React hook for setting username
     const [LobbyID,setLobbyID] = useState("") //React hook for setting Lobby ID
     const navigate = useNavigate() //Creation of useNavigate object
@@ -51,17 +50,17 @@ function User({ userId }: UserProps)
     }
 
   useEffect(() => { //UseEffect for loading lobby
-    const OnLoadUserPage = async (userId: UserProps) => {  
-      const res = await fetch(`http://localhost:3000/api/getUsername/${userId.userId}`); //GET request for obtaining user's username from user id
+    const OnLoadUserPage = async () => {  
+      const res = await fetch(`http://localhost:3000/api/getUsername/${userId}`); //GET request for obtaining user's username from user id
       const data = await res.json();
-      const username = data[0]?.UserUsername;
+      const username = data?.UserUsername;
       setUsername(username);
     };
 
     document.title = "Tagstrike - Home"; //Set title of page to home
 
   if (userId !== null) { // If there is a user id
-    OnLoadUserPage({ userId }); //Load page details for that specific user
+    OnLoadUserPage( ); //Load page details for that specific user
   }
   }, [userId]);
     return(

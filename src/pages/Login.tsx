@@ -1,5 +1,5 @@
 import { useEffect,useState } from 'react' //useEffect to make changes on loading page //useState for react hooks for dynamic changes to variables
-import { useNavigate } from "react-router-dom" //useNavigate is used to navigate between pages
+import { useNavigate,useLocation } from "react-router-dom" //useNavigate is used to navigate between pages
 
 
 //type LoginProps ensures when Login component is used that certain parameters are used
@@ -9,7 +9,7 @@ type LoginProps = {
 }
 
 function Login({ setUserID,setLoggedIn }: LoginProps){
-
+const location = useLocation();
 
  const [email,setEmail] = useState("") //React hook for setting email
  const [password, setPassword] = useState("") //React hook for setting password
@@ -48,7 +48,7 @@ const HandleSubmit = async (e:React.FormEvent)=>
             setUserID(userid) //UserID to userid
             setLoggedIn(true) //The user is logged in
             localStorage.setItem("userID", userid.toString()); //Store the user id in local
-            navigate("/user") //Navigate to user home page
+            navigate("/user",{ state: { userId: userid} }) //Navigate to user home page
           }
     }
   }
