@@ -12,7 +12,7 @@ function WinnerScreen() {
   }
   return (
     <div className="container text-center mt-5">
-      <h2>{winner} is the winner!</h2>\
+      <h2>{winner} is the winner!</h2>
       <button onClick={HandleGoHome}>Go home</button>
     </div>
   );
