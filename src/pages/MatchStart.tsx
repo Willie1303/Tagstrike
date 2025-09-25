@@ -1,30 +1,30 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useLocation } from "react-router-dom";
-import { Table, Container } from "react-bootstrap";
+import { useEffect, useState } from 'react'; //useEffect to make changes on loading page //useState for react hooks for dynamic changes to variables
+import { useNavigate, useLocation } from "react-router-dom"; //useNavigate is used to navigate between pages //useLocation for keep current stat of page
+import { Table, Container } from "react-bootstrap"; //Import "Table" and "Container" component from react-boostrap
 
-type MatchProps = {
+type MatchProps = { //Props for match id, match lobby id and currentPlayerID
   matchId: number | null;
   matchLobbyID: string | null;
   currentPlayerId: number | null;
 };
 
-interface PlayerStatus {
+interface PlayerStatus { //Inteface for current username and player readiness
   UserUsername: string;
   player_ready: boolean;
 }
 
 function MatchStart() {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { matchId, matchLobbyID, currentPlayerId } = location.state ?? {};
+  const location = useLocation(); //Creation of useLocation() object
+  const navigate = useNavigate();//Creation of useNavigate() object
+  const { matchId, matchLobbyID, currentPlayerId } = location.state ?? {}; //Get values of matchid, matchlobbyid and currentplayerid form lcation object
 
-  const [PlayerReady, setPlayerReady] = useState(false);
-  const [PlayerReadyText, setPlayerReadyText] = useState("Not ready");
-  const [MatchLobbyID, setMatchLobbyID] = useState(matchLobbyID);
-  const [CurrentPlayerID, setCurrentPlayerId] = useState(currentPlayerId);
-  const [MatchBegin, setMatchBegin] = useState(false);
-  const [MatchBeginStartingTime, setMatchBeginStartingTime] = useState<number>(5);
-  const [AllPlayerStatuses, setAllPlayerStatuses] = useState<PlayerStatus[]>([]);
+  const [PlayerReady, setPlayerReady] = useState(false); //react hook for player ready
+  const [PlayerReadyText, setPlayerReadyText] = useState("Not ready"); //react hook for player ready text
+  const [MatchLobbyID, setMatchLobbyID] = useState(matchLobbyID); //react hook for match lobbyid
+  const [CurrentPlayerID, setCurrentPlayerId] = useState(currentPlayerId); //react hook for current player id
+  const [MatchBegin, setMatchBegin] = useState(false); //react hook for Match begin
+  const [MatchBeginStartingTime, setMatchBeginStartingTime] = useState<number>(5); //react hook for match starting time
+  const [AllPlayerStatuses, setAllPlayerStatuses] = useState<PlayerStatus[]>([]); //react hook for player readyness
 
   // Toggle ready
   const HandleToggleReady = async () => {
@@ -33,7 +33,7 @@ function MatchStart() {
     setPlayerReadyText(newStatus ? "Ready" : "Not ready");
 
     try {
-      const result = await fetch(`http://localhost:3000/api/updatePlayerStatus`, {
+      const result = await fetch(`http://localhost:3000/api/updatePlayerStatus`, { //POST request to change player status
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
@@ -57,15 +57,15 @@ function MatchStart() {
 
     const interval = setInterval(async () => {
       try {
-        const response = await fetch(`http://localhost:3000/api/getMatchStatus/${matchId}`);
+        const response = await fetch(`http://localhost:3000/api/getMatchStatus/${matchId}`); //GET request to fetch all player statuses for a specific match
         const data = await response.json();
-        setAllPlayerStatuses(data.match_status_players);
+        setAllPlayerStatuses(data.match_status_players); //Set all player statuses to data from request
 
         const readyCount = data.match_status_players.filter(
           (player: PlayerStatus) => player.player_ready
         ).length;
 
-        if (readyCount >= 2) {
+        if (readyCount >= 2 && readyCount == data.match_status_players.length) { //If at least 2 players are ready and everyone is ready
           setMatchBegin(true); // Start countdown
         }
       } catch (error) {
@@ -97,13 +97,12 @@ function MatchStart() {
 
     const startMatchAndNavigate = async () => {
       try {
-        const res = await fetch(`http://localhost:3000/api/StartMatch`, {
+        const res = await fetch(`http://localhost:3000/api/StartMatch`, { //POST request to start match
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ matchID: matchId }),
+          body: JSON.stringify({ matchID: matchId }), //Pass that match id
         });
         const data = await res.json();
-        console.log("Match started:", data.match_started);
 
         navigate('/match', { 
           state: { matchId, matchLobbyID, currentPlayerId } 
@@ -118,13 +117,13 @@ function MatchStart() {
 
   return (
     <div>
-      <h3>Match Lobby: {MatchLobbyID ?? "Not Assigned"}</h3>
+      <h3>Match Lobby: {MatchLobbyID ?? "Not Assigned"}</h3> {/* Display lobby id */}
       <hr />
       <p>{PlayerReadyText}</p>
-      <button onClick={HandleToggleReady}>Toggle Ready</button>
+      <button onClick={HandleToggleReady}>Toggle Ready</button> {/* Button to toggle readyness */}
       <hr />
       <Container fluid>
-        <Table bordered variant="dark">
+        <Table bordered variant="dark"> {/* Table to display statuses of all players sorted to username */}
           <thead>
             <tr className='row'>
               <th className="col">Player</th>
@@ -146,11 +145,11 @@ function MatchStart() {
       </Container>
       {MatchBegin && (
         <div>
-          <span>Match starting in {MatchBeginStartingTime} {MatchBeginStartingTime === 1 ? "second" : "seconds"}</span>
+          <span>Match starting in {MatchBeginStartingTime} {MatchBeginStartingTime === 1 ? "second" : "seconds"}</span> {/* Element that shows countdown to 0 */}
         </div>
       )}
     </div>
   );
 }
 
-export default MatchStart;
+export default MatchStart; //Export "MatchStart" component

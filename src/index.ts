@@ -1,138 +1,118 @@
-import express from "express";
-import cors from "cors";
-import bodyParser from "body-parser";
-import dotenv from "dotenv"
-import { Pool } from "pg";
-import bcrypt from "bcrypt";
+//Libraries
+import express from "express"; //Runs application and creates api calls
+import cors from "cors"; //Allows for the frontend and backend to be seperated
+import bodyParser from "body-parser"; //Allows for body to be sent with a POST request 
+import dotenv from "dotenv" //Configuration of database environment
+import { Pool } from "pg"; //Postgresql for storing and retrieving data
+import bcrypt from "bcrypt";//Encrypting and storing user passwords
 
-dotenv.config()
 
-const app = express();
-const PORT = 3000;
-const saltRounds = 10;
+dotenv.config() //Configure environment variables
 
-async function hashPassword(plainPassword: string) {
+const app = express(); // create express() object
+const PORT = 3000; //Server runs on port 3000
+const saltRounds = 10; //Number of rounds to salt password
+
+async function hashPassword(plainPassword: string) { //Function to create a salted hash value of a user's password to store in the database instead of storing their password to avoid major problems
   const salt = await bcrypt.genSalt(saltRounds); // generate a unique salt
-  const hashedPassword = await bcrypt.hash(plainPassword, salt);
-  return hashedPassword;
+  const hashedPassword = await bcrypt.hash(plainPassword, salt); //Create hashed password
+  return hashedPassword; //return hashed password
 }
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
+const pool = new Pool({ //Create pool to communicate with postgresql database on render
+  connectionString: process.env.DATABASE_URL, //connection string
+  ssl: { rejectUnauthorized: false } //Makes sure that ssl does not reject unauthorised users (Players)
 });
 
-app.use(cors())
-app.use(express.json())
+app.use(cors()) //Frontend and backend are seperated
+app.use(express.json()) //app uses json
 
-app.use(bodyParser.json({ limit: "10mb" }))
+app.use(bodyParser.json({ limit: "10mb" })) //Limit of body data size is change to 10 mb for more data to be sent over
 
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true })); //Makes data be accessible in javascript
 
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`); //The server is live on port 3000
 });
 
-//test
-app.get("/", (req, res) => {
-  res.send("Test");
-  //console.log("LOL")
-});
-
-app.get("/api/users", async (req, res) => {
-  try {
-    const result = await pool.query('SELECT "UserID" FROM "User"');
-    res.json(result.rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Database query failed" });
-  }
-});
-
-  app.post("/api/register",async (req,res)=>{
-    const { userEmail, userUsername,userPassword,imageFace,profilePhoto } = req.body;
+  app.post("/api/register",async (req,res)=>{ //POST request to register a user
+    const { userEmail, userUsername,userPassword,profilePhoto } = req.body; //elements of body
     
-    try {
-            var results = await pool.query('SELECT "UserUsername" FROM "User" where "UserEmail" = $1',[userEmail]);
+    try { //try catch to insert new user
+            var results = await pool.query('SELECT "UserUsername" FROM "User" where "UserEmail" = $1',[userEmail]); //Check if user with that email already exists
             if (results.rows.length != 0) {
               return res.status(401).json({ error: "There is already a account with that address" });
             }
             else
               {
-                //Facescan part lol
-                const imageFaceDescriptor  = imageFace
-                //
-                results = await pool.query('INSERT INTO "Facescan"(face_scan_descriptor) VALUES($1) RETURNING "face_scan_id"',[imageFaceDescriptor]);
-                const newUserFaceID = results.rows[0].face_scan_id
-                const hashedUserPassword = await hashPassword(userPassword)
+                const hashedUserPassword = await hashPassword(userPassword) //Hash user password
 
-                results = await pool.query('INSERT INTO "User"("UserEmail","UserUsername","UserPassword","UserFaceScanID","UserProfilePhoto") VALUES($1,$2,$3,$4,$5) RETURNING "UserID"',[userEmail,userUsername,hashedUserPassword,newUserFaceID,profilePhoto]);
-                //const newUserID = results.rows[0].UserID;
+                results = await pool.query('INSERT INTO "User"("UserEmail","UserUsername","UserPassword","UserProfilePhoto") VALUES($1,$2,$3,$5) RETURNING "UserID"',[userEmail,userUsername,hashedUserPassword,profilePhoto]); //Store details of user
               }
 
     } catch (error) {
-     console.log(error) 
+     console.log(error) //Log error
     }
   })
-  app.post("/api/login", async (req,res)=>
+  app.post("/api/login", async (req,res)=> //POST request to login a user
   {
-    const { userEmail, userPassword } = req.body;
+    const { userEmail, userPassword } = req.body; //elements of body
 
     try {
-      const result = await pool.query('SELECT "UserPassword","UserID" FROM "User" where "UserEmail" = $1',[userEmail]);
+      const result = await pool.query('SELECT "UserPassword","UserID" FROM "User" where "UserEmail" = $1',[userEmail]); //Check if user with that email already exists
       if (result.rows.length === 0) {
       return res.status(401).json({ error: "User not found" });
     }
     
-      const hashedPassword = result.rows[0].UserPassword;
-      const isMatch = await bcrypt.compare(userPassword, hashedPassword);
-      const user = result.rows[0];
-      if (isMatch) {
-      res.json({ message: "Login successful!",userId: user.UserID });
+      const hashedPassword = result.rows[0].UserPassword; //Hash logged in user password
+      const isMatch = await bcrypt.compare(userPassword, hashedPassword); //Compare logged in user password with the password stored in database
+      const user = result.rows[0]; //Get user
+      if (isMatch) { //If the user typed in the correct password
+      res.json({ message: "Login successful!",userId: user.UserID }); //The user is logged in
       //return true;
 
     } else {
-      res.status(401).json({ error: "Invalid password" });
+      res.status(401).json({ error: "Invalid password" });//The user incorrectly typed their password
       //return false
     }
 
     } catch (err) {
-      console.error(err);
+      console.error(err); //catch error
       res.status(500).json({ error: "Database query failed:" });
     }
   });
 
-  app.get("/api/getUserID",async (req,res) =>{
-      const { userEmail} = req.query;
-  try {
+  app.get("/api/getUserID",async (req,res) =>{ //GET request to get userid using their email
+      const { userEmail } = req.query; //Get email from the query parameter
+  try { //Try catch
     const result = await pool.query(
-      'SELECT "UserID" FROM "User" WHERE "UserEmail" = $1',
+      'SELECT "UserID" FROM "User" WHERE "UserEmail" = $1', //Check if user with that email exists
       [userEmail]
     );
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: "User not found" });
+    if (result.rows.length === 0) { //If result yields 0 users
+      return res.status(404).json({ error: "User not found" }); //User with that email does not exist
     }
 
     // Send back just the user ID
-    const data_user_id = result.rows[0].UserID;
-    res.json({ userId: data_user_id });
+    const data_user_id = result.rows[0].UserID; 
+    res.json({ userId: data_user_id });//Returns user id to frontend
   } catch (err) {
-    console.error(err);
+    console.error(err); //catch error
     res.status(500).json({ error: "Database query failed" });
   }
 });
 
 
-    app.get("/api/getUsername/:id", async (req,res)=>
+    app.get("/api/getUsername/:id", async (req,res)=> //GET request to get user's username using their id
   {
-    const userID = req.params.id;
+    const userID = req.params.id; //Get UserID from the parameter
 
     try {
-      const result = await pool.query('SELECT "UserUsername" FROM "User" where "UserID" = $1',[userID]);
-      res.json(result.rows);
+      const result = await pool.query('SELECT "UserUsername" FROM "User" where "UserID" = $1',[userID]); //query to get Username
+      res.json(result.rows[0]);
     } catch (err) {
-      console.error(err);
+      console.error(err); //catch error
       res.status(500).json({ error: "Database query failed" });
     }
   });
@@ -197,7 +177,6 @@ app.post("/api/joinMatch",async(req,res)=>
 app.get("/api/getMatchStatus/:matchID",async(req,res)=>
   {
     const {matchID} = req.params
-      //select "UserUsername",player_ready from "Player" join "User" on "Player".user_id = "User"."UserID" where match_id = 33
     var result = await pool.query('SELECT "UserUsername",player_ready from "Player" join "User" on "Player".user_id = "User"."UserID" where match_id = $1',[matchID])
     const players = result.rows
     res.json({ match_status_players: players });
