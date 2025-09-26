@@ -1,3 +1,6 @@
+// Tumelo Kasumba : 2023738970
+// Jan-Willem Greyvenstein : 2023256304
+
 //Libraries
 import express from "express"; //Runs application and creates api calls
 import cors from "cors"; //Allows for the frontend and backend to be seperated

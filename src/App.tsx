@@ -1,3 +1,5 @@
+// Tumelo Kasumba : 2023738970
+// Jan-Willem Greyvenstein : 2023256304
 
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom" //Allows for navigation links in the navbar and navigation between pages.
 import { Navbar, Nav, Container } from "react-bootstrap" // Components imported from react-boostrap

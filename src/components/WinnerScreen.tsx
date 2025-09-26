@@ -1,3 +1,6 @@
+// Tumelo Kasumba : 2023738970
+// Jan-Willem Greyvenstein : 2023256304
+
 import { useLocation,useNavigate } from "react-router-dom"; //useNavigate is used to navigate between pages//useLocation is used to keep state of page
 
 function WinnerScreen() {
