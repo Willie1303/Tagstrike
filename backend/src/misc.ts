@@ -1,3 +1,8 @@
+/*
+  Jan-Willem Greyvenstein: 2023256304
+  Tumelo Kasumba: 2023738970
+*/
+
 import { Player } from "./types"
 
 //Arsenal: types of weapons a player can use

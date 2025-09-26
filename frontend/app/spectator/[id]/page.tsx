@@ -1,3 +1,8 @@
+/*
+  Jan-Willem Greyvenstein: 2023256304
+  Tumelo Kasumba: 2023738970
+*/
+
 "use client"
 
 import { useState, useRef, useEffect } from "react"
@@ -274,7 +279,7 @@ export default function SpectatorPage() {
               <div className="flex items-center justify-between">
                 <Button
                   variant="ghost"
-                  onClick={() => setSelectedPlayer(null)}
+                  onClick={()=> window.location.reload()}
                   className="text-white hover:text-gray-300 text-sm"
                 >
                   ← Back to Multi-View
@@ -383,6 +388,7 @@ export default function SpectatorPage() {
 
     // Multi-camera grid view
     return (
+      
       <div className="min-h-screen flex flex-col bg-background">
         {/* Header */}
         <header className="bg-card/80 backdrop-blur-md border-b border-border p-4">

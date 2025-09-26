@@ -1,5 +1,9 @@
-// This file defines the types used in the backend of the game server.
+/*
+  Jan-Willem Greyvenstein: 2023256304
+  Tumelo Kasumba: 2023738970
+*/
 
+// This file defines the types used in the backend of the game server.
 export type JoinRoomResponse = {
   success: boolean;
   message?: string;

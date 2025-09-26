@@ -1,3 +1,8 @@
+/*
+  Jan-Willem Greyvenstein: 2023256304
+  Tumelo Kasumba: 2023738970
+*/
+
 import express, { Request, Response } from "express";
 import { createServer } from "http";
 import {createNewServer} from "./socketsLogic";
@@ -214,111 +219,6 @@ io.on("connection", (socket) => {
         }
         // io.to(data.gameID).emit("updateRoom", roomsPlayers[data.gameID])
     })
-
-
-    /**
-     * EVENTTYPES
-     * 0 => shoot
-     * 1 => heal
-     * 2 => ...
-     */
-
-    /*
-    socket.on("triggerEvent",(data: TriggerEventPayload)=>{
-        if (data.eventType<0){
-            return;
-        }
-
-        console.log('eventData')
-        console.log(data.eventData)
-
-        switch (data.eventType) {
-            case 0: // shoot event
-                let damage = data.eventData.weapon?.damage || 10; // Default damage=10
-                let victimId = data.eventData.victim;
-                let shooterId = data.eventData.shooter; //ID of the player taking the shot
-                const shooter = roomsPlayers[data.gameID].find(p => p.shootId === shooterId);
-
-                if (!shooter?.isAlive) return;
-
-                // Decrease player health
-                const updatedPlayers = roomsPlayers[data.gameID].map(p => {
-                    // hit the victim
-                    if (p.shootId === victimId) {
-                      const newHealth = Math.max(p.health - damage,0);
-
-                      console.log(`Hit player: ${victimId}`)
-
-                      return {
-                        ...p,
-                        health: newHealth,
-                        isAlive: newHealth > 0
-                      };
-                    }
-                    // reward the shooter
-                    if (p.shootId === shooterId && p.health <= damage) {
-                        console.log(`${shooterId} points: ${p.score + 100}`)
-                      return {
-                        ...p,
-                        score: p.score + 100
-                      };
-                    }
-                    // everyone else stays the same
-                    return p;
-                });
-                
-                //check if any players died
-                if (victimId) {
-                  const victim = updatedPlayers.find(p => p.shootId === victimId);
-                  if (victim && victim.health <= 0) {
-                    victim.respawnScheduled = true
-                    console.log(`Player ${victimId} has died.`);
-                  }
-                
-                  roomsPlayers[data.gameID] = updatedPlayers;
-
-                  if (roomsPlayers[data.gameID]) {
-                    const alivePlayersCount = roomsPlayers[data.gameID].filter(p => p.isAlive).length;
-                    console.log(`Alive players in game ${data.gameID}: ${alivePlayersCount}`);
-
-                    if (alivePlayersCount <= 1) { // If 1 or 0 players are alive (0 could happen if last two die simultaneously)
-                        console.log(`Game ${data.gameID} ending: Only ${alivePlayersCount} player(s) remaining.`);
-                        // io.to(data.gameID).emit("endSession");
-                        //delete roomsPlayers[data.gameID];
-                    }
-                  }
-                }
-                break;
-            case 1: // heal event
-                let healAmount = data.eventData.healAmount || 20; // Default heal amount=20
-                let playerId = data.eventData.playerId;
-                const playerToHeal = roomsPlayers[data.gameID].find(p => p.shootId === playerId);
-
-                if (!playerToHeal?.isAlive) return;
-
-                // Increase player health
-                const updatedHealthPlayers = roomsPlayers[data.gameID].map(p => {
-                    if (p.shootId === playerId) {
-                        const newHealth = Math.max(p.health + healAmount, 100); // Assuming max health is 100
-                        return {
-                            ...p,
-                            health: newHealth,
-                            isAlive: newHealth > 0
-                        };
-                    }
-                    return p;
-                });
-
-                roomsPlayers[data.gameID] = updatedHealthPlayers;
-                io.to(data.gameID).emit("updateRoom", updatedHealthPlayers);
-                break;
-            case 2:
-        
-            default:
-                break;
-        }
-    })
-    */
 
     socket.on("triggerEvent", (data: TriggerEventPayload) => {
       //check which event is happening

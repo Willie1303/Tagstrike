@@ -1,3 +1,8 @@
+/*
+  Jan-Willem Greyvenstein: 2023256304
+  Tumelo Kasumba: 2023738970
+*/
+
 import { Server } from "socket.io";
 import { Server as HTTPServer } from "http";
 import { JoinRoomResponse, Player, SocketData } from "./types";

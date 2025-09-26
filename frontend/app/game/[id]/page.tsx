@@ -1,4 +1,10 @@
+/*
+  Jan-Willem Greyvenstein: 2023256304
+  Tumelo Kasumba: 2023738970
+*/
+
 "use client"
+
 import { useState, useEffect, useRef, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -420,30 +426,6 @@ useEffect(() => {
     };
     }, [cameraActive, gameId, webSocket]);
 
-
-// --- ref callback for video element: assign srcObject when element mounts ---
-/*const setVideoRef = useCallback((el: HTMLVideoElement | null) => {
-  //videoRef.current = el;
-  // if we already have a stream, attach it now
-  if (el && streamRef.current) {
-    try {
-      el.srcObject = streamRef.current;
-      // attempt to play (may require user gesture in some browsers)
-      const playPromise = el.play();
-      if (playPromise && typeof playPromise.then === "function") {
-        playPromise.catch(err => {
-          // autoplay blocked: that's fine, user gesture will permit playback later
-          console.warn("Video play() prevented by autoplay policy:", err);
-        });
-      }
-      console.log("Attached stream to video element via ref callback.");
-    } catch (err) {
-      console.error("Failed to assign srcObject to video element:", err);
-    }
-  }
-}, []);
-*/
-
 // Separate useEffect for event listener
 useEffect(() => {
   if (cameraActive && videoRef.current && canvasRef.current && modelReady) {
@@ -662,7 +644,7 @@ useEffect(() => {
       return newPowerup;
     };
 
-   const audioCtx = useRef(new (window.AudioContext || window.webkitAudioContext)());
+  const audioCtx = useRef(new (window.AudioContext || window.webkitAudioContext)());
 
   const loadAndPlaySound = async (url = "/sounds/pew.mp3") => {
       try {
