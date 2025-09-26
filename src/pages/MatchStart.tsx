@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'; //useEffect to make changes on loading page //useState for react hooks for dynamic changes to variables
+import { useEffect, useState,useRef } from 'react'; //useEffect to make changes on loading page //useState for react hooks for dynamic changes to variables
 import { useNavigate, useLocation } from "react-router-dom"; //useNavigate is used to navigate between pages //useLocation for keep current stat of page
 import { Table, Container } from "react-bootstrap"; //Import "Table" and "Container" component from react-boostrap
 
@@ -75,21 +75,29 @@ function MatchStart() {
 
     return () => clearInterval(interval);
   }, [matchId, MatchBegin]);
-
+const intervalRef = useRef<NodeJS.Timeout | null>(null);
   // Countdown timer
-  useEffect(() => {
-    if (!MatchBegin) return;
+useEffect(() => {
+  if (!MatchBegin) return;
 
-    const interval = setInterval(() => {
-      setMatchBeginStartingTime(prev => {
-        if (prev > 0) return prev - 1;
-        clearInterval(interval); // stop countdown at 0
-        return 0;
-      });
-    }, 1000);
+  if (intervalRef.current) return; // prevent duplicate interval
 
-    return () => clearInterval(interval);
-  }, [MatchBegin]);
+  intervalRef.current = setInterval(() => {
+    setMatchBeginStartingTime(prev => {
+      if (prev > 0) return prev - 1;
+      clearInterval(intervalRef.current!);
+      intervalRef.current = null;
+      return 0;
+    });
+  }, 1000);
+
+  return () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  };
+}, [MatchBegin]);
 
   // Trigger match start when countdown reaches 0
   useEffect(() => {
@@ -117,10 +125,10 @@ function MatchStart() {
 
   return (
     <div>
-      <h3>Match Lobby: {MatchLobbyID ?? "Not Assigned"}</h3> {/* Display lobby id */}
+      <h3 className='brand-color-matrix'>Match Lobby: {MatchLobbyID ?? "Not Assigned"}</h3> {/* Display lobby id */}
       <hr />
-      <p>{PlayerReadyText}</p>
-      <button onClick={HandleToggleReady}>Toggle Ready</button> {/* Button to toggle readyness */}
+      <p className='brand-color-matrix'>{PlayerReadyText}</p>
+      <button className='brand-color-matrix' onClick={HandleToggleReady}>Toggle Ready</button> {/* Button to toggle readyness */}
       <hr />
       <Container fluid>
         <Table bordered variant="dark">
@@ -146,7 +154,7 @@ function MatchStart() {
       </Container>
       {MatchBegin && (
         <div>
-          <span>Match starting in {MatchBeginStartingTime} {MatchBeginStartingTime === 1 ? "second" : "seconds"}</span> {/* Element that shows countdown to 0 */}
+          <span className='brand-color-matrix'>Match starting in {MatchBeginStartingTime} {MatchBeginStartingTime === 1 ? "second" : "seconds"}</span> {/* Element that shows countdown to 0 */}
         </div>
       )}
     </div>

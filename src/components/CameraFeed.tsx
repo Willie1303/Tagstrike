@@ -33,7 +33,7 @@ const CameraFeed: React.FC = () => {
   return (
     <div>
       {error && <div className="text-danger">{error}</div>}
-      <video ref={videoRef} autoPlay muted playsInline className="w-100 rounded" />
+      <video ref={videoRef} autoPlay muted playsInline className="w-100 rounded"></video>
     </div>
   );
 };
