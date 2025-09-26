@@ -312,7 +312,7 @@ app.post("/api/hitplayer", async (req, res)=>
         //Player shot
         result = await pool.query('UPDATE "Player" SET player_health = $3 WHERE user_id = $1 AND  match_id = $2',[playershotid,matchID,playerShotHealth-value])
         
-        result = await pool.query('INSERT INTO "MatchAction"(match_id,user_id,action_type,action_2nd_player,action_type_value) VALUES ($1,$2,"hit",$3,$4)',[matchID,playerID,playershotid,value])
+        result = await pool.query('INSERT INTO "MatchAction"(match_id,user_id,action_type,action_2nd_player,action_type_value) VALUES ($1,$2,$5,$3,$4)',[matchID,playerID,playershotid,value,"hit"])
         result = await pool.query('UPDATE "Player" SET player_score = $3 WHERE user_id = $1 AND  match_id = $2',[playerID,matchID,playerScore+value])
 
 
@@ -320,8 +320,8 @@ app.post("/api/hitplayer", async (req, res)=>
       { //Player 'killed'
         //Add hit to playeractions
         result = await pool.query('UPDATE "Player" SET player_health = $3 WHERE user_id = $1 AND  match_id = $2',[playershotid,matchID,0])
-        result = await pool.query('INSERT INTO "MatchAction"(match_id,user_id,action_type,action_2nd_player,action_type_value) VALUES ($1,$2,"hit",$3,$4)',[matchID,playerID,playershotid,value])
-        result = await pool.query('INSERT INTO "MatchAction"(match_id,user_id,action_type,action_2nd_player,action_type_value) VALUES ($1,$2,"kill",$3,$4)',[matchID,playerID,playershotid,null])
+        result = await pool.query('INSERT INTO "MatchAction"(match_id,user_id,action_type,action_2nd_player,action_type_value) VALUES ($1,$2,$5,$3,$4)',[matchID,playerID,playershotid,value,"hit"])
+        result = await pool.query('INSERT INTO "MatchAction"(match_id,user_id,action_type,action_2nd_player,action_type_value) VALUES ($1,$2,$5,$3,$4)',[matchID,playerID,playershotid,null,"kill"])
         result = await pool.query('UPDATE "Player" SET player_score = $3 WHERE user_id = $1 AND  match_id = $2',[playerID,matchID,playerScore+value])
       }
     } 
