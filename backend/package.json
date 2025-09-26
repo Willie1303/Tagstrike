@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "start": "node src/app.js",
+    "start": "ts-node src/app.ts",
     "dev": "nodemon"
   },
   "devDependencies": {
