@@ -284,10 +284,12 @@ app.post("/api/StartMatch",async (req,res) =>
     });
 app.get("/api/getMatchEndTime", async (req, res) => {
   const matchID = req.query.matchID;
-  const result = await pool.query(
-    `SELECT match_end_time FROM "Match" WHERE match_id = $1`,
-    [matchID]
-  );
+const result = await pool.query(
+      `SELECT match_end_time AT TIME ZONE 'UTC' AS match_end_time 
+       FROM "Match" 
+       WHERE match_id = $1`,
+      [matchID]
+    )
 
   if (result.rows.length > 0) {
     res.json({ match_end_time: result.rows[0].match_end_time });

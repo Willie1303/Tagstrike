@@ -3,12 +3,15 @@ import { useLocation,useNavigate } from "react-router-dom";
 function WinnerScreen() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { winner,currentPlayerId } = location.state ?? { winner: "Unknown" };
+  const { winner, currentPlayerId } = location.state ?? { winner: "Unknown" };
 
 
   const HandleGoHome = async()=>
-  {
-    navigate("/user", { state: { userId:currentPlayerId } })
+  { 
+    console.log(currentPlayerId)
+        navigate("/user", { 
+      state: { userId: currentPlayerId, fromWinner: true },
+      replace: true });
   }
   return (
     <div className="container text-center mt-5">
