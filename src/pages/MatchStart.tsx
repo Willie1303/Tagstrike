@@ -46,7 +46,7 @@ const [colorConfirmed, setColorConfirmed] = useState(false); //react hook for pl
   
 
     try {
-      const result = await fetch(`http://localhost:3000/api/updatePlayerStatus`, { //POST request to change player status
+      const result = await fetch(`https://tagstrike.onrender.com/api/updatePlayerStatus`, { //POST request to change player status
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
@@ -104,7 +104,7 @@ const handleTakeSnapshot = async () => {
   setColorConfirmed(true);
 
   try {
-    await fetch(`http://localhost:3000/api/setPlayerColour`, {
+    await fetch(`https://tagstrike.onrender.com/api/setPlayerColour`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ 
@@ -149,7 +149,7 @@ useEffect(() => {
 
     const interval = setInterval(async () => {
       try {
-        const response = await fetch(`http://localhost:3000/api/getMatchStatus/${matchId}`); //GET request to fetch all player statuses for a specific match
+        const response = await fetch(`https://tagstrike.onrender.com/api/getMatchStatus/${matchId}`); //GET request to fetch all player statuses for a specific match
         const data = await response.json();
         setAllPlayerStatuses(data.match_status_players); //Set all player statuses to data from request
 
@@ -197,7 +197,7 @@ useEffect(() => {
 
     const startMatchAndNavigate = async () => {
       try {
-        const res = await fetch(`http://localhost:3000/api/StartMatch`, { //POST request to start match
+        const res = await fetch(`https://tagstrike.onrender.com/api/StartMatch`, { //POST request to start match
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ matchID: matchId }), //Pass that match id

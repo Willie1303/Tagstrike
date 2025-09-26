@@ -19,7 +19,7 @@ function CreateMatch()
             const now = new Date() //Get current date
             const Timestamp = now.toISOString().slice(0,16).replace("T", " ") + ":00" //Create timestamp at current moment
             now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-        var result = await fetch("http://localhost:3000/api/createMatch", { //POST request to create match
+        var result = await fetch("https://tagstrike.onrender.com/api/createMatch", { //POST request to create match
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -34,7 +34,7 @@ function CreateMatch()
     var data = await result.json() //JSON the result
 
     const Match_ID = data.match_id //Get returned match id from result
-    result = await fetch("http://localhost:3000/api/joinMatch", { //POST request to join a match with a match id and user id
+    result = await fetch("https://tagstrike.onrender.com/api/joinMatch", { //POST request to join a match with a match id and user id
       method: "POST",
       headers: {
         "Content-Type": "application/json",

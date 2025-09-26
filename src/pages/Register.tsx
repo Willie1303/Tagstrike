@@ -39,7 +39,7 @@ const handleFileChange = ( // Anonymous function to handle profile photo changes
       {
         if(password == rtpassword) //If password and retyped password are a match
           {
-           const response = await fetch("http://localhost:3000/api/register", {
+           const response = await fetch("https://tagstrike.onrender.com/api/register", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({

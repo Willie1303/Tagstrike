@@ -38,7 +38,7 @@ function Match() {
       try {
         document.title = "Tagstrike - Match - " + matchProp.matchLobbyID;
 
-        const res = await fetch(`http://localhost:3000/api/getUsername/${currentPlayerId}`);
+        const res = await fetch(`https://tagstrike.onrender.com/api/getUsername/${currentPlayerId}`);
         const data = await res.json();
         const username = data[0]?.UserUsername ?? "Unknown";
         setPlayerUsername(username);
@@ -60,7 +60,7 @@ function Match() {
 
     const updateMatch = async () => {
       try {
-        const resStats = await fetch(`http://localhost:3000/api/getStatistics?matchID=${matchId}`);
+        const resStats = await fetch(`https://tagstrike.onrender.com/api/getStatistics?matchID=${matchId}`);
         const playersData: PlayerStats[] = await resStats.json();
         setPlayers(playersData);
 
@@ -79,7 +79,7 @@ function Match() {
           return;
         }
 
-        const resEnd = await fetch(`http://localhost:3000/api/getMatchEndTime?matchID=${matchId}`);
+        const resEnd = await fetch(`https://tagstrike.onrender.com/api/getMatchEndTime?matchID=${matchId}`);
         const { match_end_time } = await resEnd.json();
         const endTime = new Date(match_end_time).getTime();
         const now = Date.now();
@@ -114,14 +114,14 @@ function Match() {
     try {
       // Map detected color to a player ID
     const resPlayer = await fetch(
-      `http://localhost:3000/api/getPlayerbyColour?matchID=${matchId}&detected_player_colour=${encodeURIComponent(colour_string)}`
+      `https://tagstrike.onrender.com/api/getPlayerbyColour?matchID=${matchId}&detected_player_colour=${encodeURIComponent(colour_string)}`
     );
     const { player_id } = await resPlayer.json();
 
           if (!player_id || player_id === currentPlayerId) return;
 
       // Hit the player
-      await fetch("http://localhost:3000/api/hitplayer", {
+      await fetch("https://tagstrike.onrender.com/api/hitplayer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ matchID: matchId, playerID: currentPlayerId, playershotid: player_id })
