@@ -10,7 +10,7 @@ import bcrypt from "bcrypt";//Encrypting and storing user passwords
 dotenv.config() //Configure environment variables
 
 const app = express(); // create express() object
-const PORT = 3000; //Server runs on port 3000
+const PORT = process.env.PORT || 3000; //Server runs on port 3000
 const saltRounds = 10; //Number of rounds to salt password
 
 async function hashPassword(plainPassword: string) { //Function to create a salted hash value of a user's password to store in the database instead of storing their password to avoid major problems
@@ -24,7 +24,10 @@ const pool = new Pool({ //Create pool to communicate with postgresql database on
   ssl: { rejectUnauthorized: false } //Makes sure that ssl does not reject unauthorised users (Players)
 });
 
-app.use(cors()) //Frontend and backend are seperated
+app.use(cors({
+  origin: "https://tagstrike.onrender.com", // Allow only your frontend
+  credentials: true
+})); //Frontend and backend are seperated
 app.use(express.json()) //app uses json
 
 app.use(bodyParser.json({ limit: "10mb" })) //Limit of body data size is change to 10 mb for more data to be sent over
@@ -47,7 +50,7 @@ app.listen(PORT, () => {
               {
                 const hashedUserPassword = await hashPassword(userPassword) //Hash user password
 
-                results = await pool.query('INSERT INTO "User"("UserEmail","UserUsername","UserPassword","UserProfilePhoto") VALUES($1,$2,$3,$5) RETURNING "UserID"',[userEmail,userUsername,hashedUserPassword,profilePhoto]); //Store details of user
+                results = await pool.query('INSERT INTO "User"("UserEmail","UserUsername","UserPassword","UserProfilePhoto") VALUES($1,$2,$3,$4) RETURNING "UserID"',[userEmail,userUsername,hashedUserPassword,profilePhoto]); //Store details of user
               }
 
     } catch (error) {
