@@ -1,4 +1,11 @@
 {
+  "name": "my-project",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "node index.js",
+    "build": "echo 'No build step defined'"
+  },
   "dependencies": {
     "@tensorflow/tfjs-backend-webgl": "^4.22.0",
     "opencv.js": "^1.2.1"
