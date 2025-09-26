@@ -1,3 +1,6 @@
+// Tumelo Kasumba : 2023738970
+// Jan-Willem Greyvenstein : 2023256304
+
 import { useEffect } from 'react' //useEffect to make changes on loading page
 import { useNavigate } from "react-router-dom" //useNavigate is used to navigate between page
 

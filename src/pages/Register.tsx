@@ -1,4 +1,7 @@
 
+// Tumelo Kasumba : 2023738970
+// Jan-Willem Greyvenstein : 2023256304
+
 import { useEffect,useState } from 'react' //useEffect to make changes on loading page //useState for react hooks for dynamic changes to variables
 import { useNavigate } from "react-router-dom" //useNavigate is used to navigate between pages
 import { Alert } from 'react-bootstrap' //Using alert component from react-boostrap
@@ -39,7 +42,7 @@ const handleFileChange = ( // Anonymous function to handle profile photo changes
       {
         if(password == rtpassword) //If password and retyped password are a match
           {
-           const response = await fetch("http://localhost:3000/api/register", {
+           const response = await fetch("https://tagstrike.onrender.com/api/register", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({

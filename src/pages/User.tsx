@@ -1,3 +1,6 @@
+// Tumelo Kasumba : 2023738970
+// Jan-Willem Greyvenstein : 2023256304
+
 import { useEffect, useState } from 'react' //useEffect to make changes on loading page //useState for react hooks for dynamic changes to variables
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; //Import FontAwesome library to use icons
 import { faHammer, faPlus } from '@fortawesome/free-solid-svg-icons'; // Import selected icons
@@ -28,11 +31,11 @@ function User() {
     const HandleJoinMatchSubmit = async (e: React.FormEvent) => { //HandleJoinMatchSubmit to handle creating a match for the user to join
         e.preventDefault() //Prevents default of form event
 
-        const res = await fetch(`http://localhost:3000/api/getMatchID/${LobbyID}`); //GET request for obtaining match id from lobby id
+        const res = await fetch(`https://tagstrike.onrender.com/api/getMatchID/${LobbyID}`); //GET request for obtaining match id from lobby id
         var data = await res.json() //Make json out of response
         const Match_ID = data.match_id //Get match_id from data
 
-        const result = await fetch("http://localhost:3000/api/joinMatch", { //POST request to join a user to a selected match
+        const result = await fetch("https://tagstrike.onrender.com/api/joinMatch", { //POST request to join a user to a selected match
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ //body of match id and user id
@@ -54,7 +57,7 @@ function User() {
         if (userId !== null) localStorage.setItem("userId", userId.toString());
 
         const OnLoadUserPage = async () => {
-            const res = await fetch(`http://localhost:3000/api/getUsername/${userId}`); //GET request for obtaining user's username from user id
+            const res = await fetch(`https://tagstrike.onrender.com/api/getUsername/${userId}`); //GET request for obtaining user's username from user id
             const data = await res.json();
             const username = data?.UserUsername;
             setUsername(username);

@@ -2,12 +2,19 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
+    "outDir": "dist",
     "jsx": "react-jsx",
+    "allowJs": true,           // Allow importing .js files
+    "checkJs": false,          // Set true if you want TS to type-check JS files
     "strict": true,
     "moduleResolution": "Node",
     "esModuleInterop": true,
-    "lib": ["DOM", "ESNext"]
+    "lib": ["DOM", "ESNext"],
+    "skipLibCheck": true       // Avoid errors from JS libraries
   },
-  "include": ["src/**/*.tsx", "src/**/*.ts"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/pages/utils/**/*.js"  // Include JS utilities explicitly
+  ]
 }
-

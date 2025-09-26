@@ -1,5 +1,8 @@
+// Tumelo Kasumba : 2023738970
+// Jan-Willem Greyvenstein : 2023256304
+
 import { useEffect,useState } from 'react' //useEffect to make changes on loading page //useState for react hooks for dynamic changes to variables
-import { useNavigate,useLocation } from "react-router-dom" //useNavigate is used to navigate between pages
+import { useNavigate,useLocation } from "react-router-dom" //useNavigate is used to navigate between pages //useLocation is used to keep state of page
 
 
 //type LoginProps ensures when Login component is used that certain parameters are used
@@ -21,7 +24,7 @@ const HandleSubmit = async (e:React.FormEvent)=>
     var Successful = true //start some boolean variable set to true
     if(email != "" && password!=""){    //If email and password are not empty values 
         try { //try catch to login a user with their email and pass word
-            const result = await fetch("http://localhost:3000/api/login", { //POST request to /api/login to login user with a body of email and password and return result
+            const result = await fetch("https://tagstrike.onrender.com/api/login", { //POST request to /api/login to login user with a body of email and password and return result
                 method: "POST", //Method type
                 headers: {
                   "Content-Type": "application/json",
@@ -38,7 +41,7 @@ const HandleSubmit = async (e:React.FormEvent)=>
         } catch (error) {
           console.error("Error logging in:", error); //Log the error
         }
-        const res = await fetch(`http://localhost:3000/api/getUserID?userEmail=${encodeURIComponent(email)}`); //GET request to /api/getUserID to get the user's id using their email
+        const res = await fetch(`https://tagstrike.onrender.com/api/getUserID?userEmail=${encodeURIComponent(email)}`); //GET request to /api/getUserID to get the user's id using their email
         const data = await res.json() //Create json of result
         const userid = Number(data.userId); //Extract userId from data
 
