@@ -18,6 +18,12 @@ function MatchStart() {
   const navigate = useNavigate();//Creation of useNavigate() object
   const { matchId, matchLobbyID, currentPlayerId } = location.state ?? {}; //Get values of matchid, matchlobbyid and currentplayerid form lcation object
 
+  const videoRef = useRef<HTMLVideoElement>(null);
+const canvasRef = useRef<HTMLCanvasElement>(null); // For shirt colours
+
+const [playerColor, setPlayerColor] = useState<string | null>(null); //react hook for player colour
+const [colorConfirmed, setColorConfirmed] = useState(false); //react hook for player colour confirmed
+
   const [PlayerReady, setPlayerReady] = useState(false); //react hook for player ready
   const [PlayerReadyText, setPlayerReadyText] = useState("Not ready"); //react hook for player ready text
   const [MatchLobbyID, setMatchLobbyID] = useState(matchLobbyID); //react hook for match lobbyid
@@ -28,9 +34,16 @@ function MatchStart() {
 
   // Toggle ready
   const HandleToggleReady = async () => {
+          if (!colorConfirmed) {
+    alert("Please detect your shirt color first!");
+    return;
+  }
     const newStatus = !PlayerReady;
     setPlayerReady(newStatus);
     setPlayerReadyText(newStatus ? "Ready" : "Not ready");
+
+
+  
 
     try {
       const result = await fetch(`http://localhost:3000/api/updatePlayerStatus`, { //POST request to change player status
@@ -50,6 +63,85 @@ function MatchStart() {
       console.error("Failed to update player status:", err);
     }
   };
+
+  //Check player colour
+const handleTakeSnapshot = async () => {
+  const video = videoRef.current;
+  const canvas = canvasRef.current;
+  if (!video || !canvas) return;
+
+  // Wait until the video has loaded metadata and has valid width/height
+  if (video.videoWidth === 0 || video.videoHeight === 0) {
+    console.log("Video not ready yet. Try again in a moment.");
+    return;
+  }
+
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = imageData.data;
+
+  // Compute average color
+  let r = 0, g = 0, b = 0, count = 0;
+  for (let i = 0; i < data.length; i += 4) {
+    r += data[i];
+    g += data[i + 1];
+    b += data[i + 2];
+    count++;
+  }
+
+  r = Math.round(r / count);
+  g = Math.round(g / count);
+  b = Math.round(b / count);
+
+  const hexColor = `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
+  setPlayerColor(hexColor);
+  setColorConfirmed(true);
+
+  try {
+    await fetch(`http://localhost:3000/api/setPlayerColour`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        userID: CurrentPlayerID,
+        matchID: matchId,
+        player_colour: hexColor
+      }),
+    });
+    console.log("Player colour set successfully:", hexColor);
+  } catch (err) {
+    console.error("Error sending player colour:", err);
+  }
+};
+
+
+  //Player colour
+useEffect(() => {
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play();
+      }
+    } catch (err) {
+      console.error("Unable to access camera:", err);
+    }
+  };
+  startCamera();
+
+  return () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      (videoRef.current.srcObject as MediaStream).getTracks().forEach(track => track.stop());
+    }
+  };
+}, []);
+
 
   // Poll for player readiness
   useEffect(() => {
@@ -130,11 +222,27 @@ useEffect(() => {
       <p className='brand-color-matrix'>{PlayerReadyText}</p>
       <button className='brand-color-matrix' onClick={HandleToggleReady}>Toggle Ready</button> {/* Button to toggle readyness */}
       <hr />
+      <div>
+      <video ref={videoRef} autoPlay muted playsInline className="w-100 rounded" />
+      <canvas ref={canvasRef} style={{ display: "none" }} />
+      {!colorConfirmed && (
+        <button className="brand-color-matrix" onClick={handleTakeSnapshot}>
+          Take Snapshot & Detect Shirt Color
+        </button>
+      )}
+      {colorConfirmed && (
+        <div className="brand-color-matrix">
+          Shirt color detected: <span>{playerColor}</span>
+        </div>
+      )}
+    </div>
+
       <Container fluid>
         <Table bordered variant="dark">
           <thead>
             <tr>
               <th>Player</th>
+              
               <th>Player Status</th>
             </tr>
           </thead>
