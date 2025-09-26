@@ -5,6 +5,7 @@ import bodyParser from "body-parser"; //Allows for body to be sent with a POST r
 import dotenv from "dotenv" //Configuration of database environment
 import { Pool } from "pg"; //Postgresql for storing and retrieving data
 import bcrypt from "bcrypt";//Encrypting and storing user passwords
+import path from 'path'; //For the directory
 
 
 dotenv.config() //Configure environment variables
@@ -24,11 +25,20 @@ const pool = new Pool({ //Create pool to communicate with postgresql database on
   ssl: { rejectUnauthorized: false } //Makes sure that ssl does not reject unauthorised users (Players)
 });
 
+const allowedOrigins  = [
+  "https://tagstrike.onrender.com",
+  "http://localhost:5173"
+];
+
 app.use(cors({
-  origin: "https://tagstrike.onrender.com", // Allow only your frontend
+  origin: allowedOrigins, // Local and website
   credentials: true
 })); //Frontend and backend are seperated
 app.use(express.json()) //app uses json
+
+const __dirname = path.resolve(); // Needed for ES modules
+
+
 
 app.use(bodyParser.json({ limit: "10mb" })) //Limit of body data size is change to 10 mb for more data to be sent over
 
@@ -435,4 +445,15 @@ app.get("/api/getStatistics", async (req, res) => { //GET request to obtain all 
     console.error(err);
     res.status(500).send("Database error");
   }
+});
+
+
+//End 
+
+
+// Serve frontend static files
+app.use(express.static(path.join(__dirname, 'dist')));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
