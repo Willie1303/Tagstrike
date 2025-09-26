@@ -125,10 +125,10 @@ useEffect(() => {
 
   return (
     <div>
-      <h3>Match Lobby: {MatchLobbyID ?? "Not Assigned"}</h3> {/* Display lobby id */}
+      <h3 className='brand-color-matrix'>Match Lobby: {MatchLobbyID ?? "Not Assigned"}</h3> {/* Display lobby id */}
       <hr />
-      <p>{PlayerReadyText}</p>
-      <button onClick={HandleToggleReady}>Toggle Ready</button> {/* Button to toggle readyness */}
+      <p className='brand-color-matrix'>{PlayerReadyText}</p>
+      <button className='brand-color-matrix' onClick={HandleToggleReady}>Toggle Ready</button> {/* Button to toggle readyness */}
       <hr />
       <Container fluid>
         <Table bordered variant="dark">
@@ -154,7 +154,7 @@ useEffect(() => {
       </Container>
       {MatchBegin && (
         <div>
-          <span>Match starting in {MatchBeginStartingTime} {MatchBeginStartingTime === 1 ? "second" : "seconds"}</span> {/* Element that shows countdown to 0 */}
+          <span className='brand-color-matrix'>Match starting in {MatchBeginStartingTime} {MatchBeginStartingTime === 1 ? "second" : "seconds"}</span> {/* Element that shows countdown to 0 */}
         </div>
       )}
     </div>

@@ -24,10 +24,7 @@ const pool = new Pool({ //Create pool to communicate with postgresql database on
   ssl: { rejectUnauthorized: false } //Makes sure that ssl does not reject unauthorised users (Players)
 });
 
-app.use(cors({
-  origin: "http://localhost:5173", // your Vite frontend
-  credentials: true
-})); //Frontend and backend are seperated
+app.use(cors()) //Frontend and backend are seperated
 app.use(express.json()) //app uses json
 
 app.use(bodyParser.json({ limit: "10mb" })) //Limit of body data size is change to 10 mb for more data to be sent over
@@ -39,8 +36,7 @@ app.listen(PORT, () => {
 });
 
   app.post("/api/register",async (req,res)=>{ //POST request to register a user
-    
-    const { userEmail, userUsername,userPassword } = req.body; //elements of body
+    const { userEmail, userUsername,userPassword,profilePhoto } = req.body; //elements of body
     
     try { //try catch to insert new user
             var results = await pool.query('SELECT "UserUsername" FROM "User" where "UserEmail" = $1',[userEmail]); //Check if user with that email already exists
@@ -51,8 +47,7 @@ app.listen(PORT, () => {
               {
                 const hashedUserPassword = await hashPassword(userPassword) //Hash user password
 
-                results = await pool.query('INSERT INTO "User"("UserEmail","UserUsername","UserPassword") VALUES($1,$2,$3) RETURNING "UserID"',[userEmail,userUsername,hashedUserPassword]); //Store details of user
-                res.status(200).json({ message: "Registration successful!", userId: results.rows[0].UserID });
+                results = await pool.query('INSERT INTO "User"("UserEmail","UserUsername","UserPassword","UserProfilePhoto") VALUES($1,$2,$3,$5) RETURNING "UserID"',[userEmail,userUsername,hashedUserPassword,profilePhoto]); //Store details of user
               }
 
     } catch (error) {
@@ -61,7 +56,6 @@ app.listen(PORT, () => {
   })
   app.post("/api/login", async (req,res)=> //POST request to login a user
   {
-
     const { userEmail, userPassword } = req.body; //elements of body
 
     try {
@@ -125,220 +119,219 @@ app.listen(PORT, () => {
 
 // Matches
 
-app.post("/api/createMatch",async(req,res)=>
+app.post("/api/createMatch",async(req,res)=> //POST request to create match
   {
     try {
-      const {matchLobbyID, matchTimeLimit, matchCreationDate, matchCreatorID} = req.body
+      const {matchLobbyID, matchTimeLimit, matchCreationDate, matchCreatorID} = req.body //variables from body
 
-      var result = await pool.query('SELECT match_id from "Match" where match_lobby_id = $1 AND match_end_time IS NOT NULL',[matchLobbyID])
+      var result = await pool.query('SELECT match_id from "Match" where match_lobby_id = $1 AND match_end_time IS NOT NULL',[matchLobbyID]) //Check if there is an ongoing match with that match id
       if (result.rows.length > 0) {
-              return res.status(401).json({ error: "There is already a ongoing match with that lobbyid" });
+              return res.status(401).json({ error: "There is already a ongoing match with that lobbyid" }); //There is already a match ongoing
             }
             else
               {
                 result = await pool.query('INSERT INTO "Match"(match_lobby_id,match_creation_date,match_time_limit) VALUES($1,$2,$3) RETURNING match_id',[matchLobbyID,matchCreationDate,matchTimeLimit])
                 const match = result.rows[0];
-                res.json({ message: "Match Creation successful",match_id: match.match_id });
+                res.json({ message: "Match Creation successful",match_id: match.match_id }); //Return match id
               }
     } catch (err) {
       console.log(err)
     }
   });
 
-app.get("/api/getMatchID/:matchLobbyID",async (req,res)=>
+app.get("/api/getMatchID/:matchLobbyID",async (req,res)=> //GET request to obtain match id from LobbyID
   {
-    const {matchLobbyID} = req.params
-    var result = await pool.query('SELECT match_id from "Match" where match_lobby_id = $1',[matchLobbyID])
+    const {matchLobbyID} = req.params //obtain lobby id from parameters
+    var result = await pool.query('SELECT match_id from "Match" where match_lobby_id = $1',[matchLobbyID]) //Get match id from lobby id
 
       if(result.rows.length===0)
       {
-        return res.status(401).json({ error: "No match with that lobby id" });
+        return res.status(401).json({ error: "No match with that lobby id" }); //No match with that lobby id was found
       }
       else
         {
-          const match_id = result.rows[0].match_id;
-          res.json({ match_id:match_id });
+          const match_id = result.rows[0].match_id; //Get match id from response
+          res.json({ match_id:match_id }); //Return match_id
 
         }
   })
 
-app.get("/api/getPlayerColour",async (req,res)=>
+app.get("/api/getPlayerColour",async (req,res)=> //GET request to obtain player colour from player id
   {
-    const {matchID, userID} = req.body
+    const {matchID, userID} = req.body //variables from body
 
-    var result = await pool.query('SELECT player_colour from "Player" where user_id = $1 AND match_id = $2',[userID,matchID])
+    var result = await pool.query('SELECT player_colour from "Player" where user_id = $1 AND match_id = $2',[userID,matchID]) //Get player colour for a certain match and player
 
     if(result.rows.length===0)
       {
-        return res.status(401).json({ error: "No player with that matchid and userid" });
+        return res.status(401).json({ error: "No player with that matchid and userid" }); //No user was found
       }
       else
         {
-          const player_colour = result.rows[0].player_colour;
-          res.json({ player_colour:player_colour });
+          const player_colour = result.rows[0].player_colour; //Obtain player colour
+          res.json({ player_colour:player_colour }); //Return player colour
 
         }
   })
 
-app.put("/api/setPlayerColour", async (req, res) => {
+app.put("/api/setPlayerColour", async (req, res) => { //PUT request to update player colour for a specific player
   try {
-    const { matchID, userID, player_colour } = req.body;
+    const { matchID, userID, player_colour } = req.body; //variables from body
 
     if (!matchID || !userID || !player_colour) {
-      return res.status(400).json({ error: "Missing required fields" });
+      return res.status(400).json({ error: "Missing required fields" }); // null values for variables
     }
 
     const result = await pool.query(
-      'UPDATE "Player" SET player_colour = $3 WHERE user_id = $1 AND match_id = $2',
+      'UPDATE "Player" SET player_colour = $3 WHERE user_id = $1 AND match_id = $2', //Update player colour based on their match id and user id
       [userID, matchID, player_colour]
     );
 
     if (result.rowCount === 0) {
-      return res.status(404).json({ set_player_colour: false, message: "Player not found" });
+      return res.status(404).json({ set_player_colour: false, message: "Player not found" }); //Player was not found
     }
 
-    res.json({ set_player_colour: true });
+    res.json({ set_player_colour: true }); //Successful update of player colour
   } catch (err) {
     console.error("Error updating player colour:", err);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Internal server error" }); //Console errors
   }
 });
 
 
-app.post("/api/joinMatch",async(req,res)=>
+app.post("/api/joinMatch",async(req,res)=> //POST request to join a player to a match
   {
-    const {matchID, userID} = req.body
+    const {matchID, userID} = req.body //variables from body
 
-    var result = await pool.query('SELECT match_id,user_id from "Player" where user_id = $1 AND match_id = $2',[userID,matchID])
+    var result = await pool.query('SELECT match_id,user_id from "Player" where user_id = $1 AND match_id = $2',[userID,matchID]) //See if there is existing player for the match
 
     if(result.rows.length>0)
       {
-        res.json({ message: "User already in match",match_joined: true }); //Join match
+        res.json({ message: "User already in match",match_joined: true }); //User already in match
       }
       else
         {
-          result = await pool.query('INSERT INTO "Player"(user_id,match_id) VALUES($1,$2)',[userID,matchID])
+          result = await pool.query('INSERT INTO "Player"(user_id,match_id) VALUES($1,$2)',[userID,matchID]) //Insert player details
           const player = result.rows[0];
-          res.json({ message: "Match joining successful!",match_joined: true });
+          res.json({ message: "Match joining successful!",match_joined: true }); //Return successful results
         }
   })
 //Match Status
-app.get("/api/getMatchStatus/:matchID",async(req,res)=>
+app.get("/api/getMatchStatus/:matchID",async(req,res)=> //GET request for match status of all player for a certain match
   {
-    const {matchID} = req.params
-    var result = await pool.query('SELECT "UserUsername",player_ready from "Player" join "User" on "Player".user_id = "User"."UserID" where match_id = $1',[matchID])
-    const players = result.rows
-    res.json({ match_status_players: players });
+    const {matchID} = req.params //obtain match id from parameters
+    //Join on for Username, player_ready from "User" and "Player" tables
+    var result = await pool.query('SELECT "UserUsername",player_ready from "Player" join "User" on "Player".user_id = "User"."UserID" where match_id = $1',[matchID]) 
+    const players = result.rows //Obtain all players
+    res.json({ match_status_players: players }); //Return players
   })
 
-  app.post("/api/updatePlayerStatus",async (req,res)=>
+  app.post("/api/updatePlayerStatus",async (req,res)=> //POST request to change player status
     {
-      const {playerID,playerStatus,matchID} = req.body
+      const {playerID,playerStatus,matchID} = req.body //variables from body
         try {
-    const result = await pool.query(
-      'UPDATE "Player" SET player_ready = $2 WHERE user_id = $1 AND  match_id = $3 RETURNING player_ready',[playerID,playerStatus,matchID])
-    if (result.rows.length === 0) {
-      // No matching row found
-      return res.status(404).json({ error: "Player not found for this match" });
-    }
-    res.json({ newStatus: result.rows[0].player_ready });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to toggle player ready" });
-  }
+        const result = await pool.query(
+          'UPDATE "Player" SET player_ready = $2 WHERE user_id = $1 AND  match_id = $3 RETURNING player_ready',[playerID,playerStatus,matchID]) //Get player_ready for a specific player
+        if (result.rows.length === 0) {
+          // No matching row found
+          return res.status(404).json({ error: "Player not found for this match" });
+        }
+        res.json({ newStatus: result.rows[0].player_ready }); //Return player status
+      } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Failed to toggle player ready" });
+      }
     })
 //Match Actions
 
-app.post("/api/StartMatch",async (req,res) =>
+app.post("/api/StartMatch",async (req,res) => //POST request for starting a match
   {
-    const {matchID} = req.body
+    const {matchID} = req.body //variable from body
 
-    var result = await pool.query('SELECT match_time_limit FROM "Match" where match_id = $1',[matchID])
-    const minutesToAdd = result.rows[0].match_time_limit
+    var result = await pool.query('SELECT match_time_limit FROM "Match" where match_id = $1',[matchID]) //Get selected time limit when match was created
+    const minutesToAdd = result.rows[0].match_time_limit //Obtain time limit of match from query
 
     result = await pool.query(
     `UPDATE "Match"
     SET match_start_time = date_trunc('second', NOW()),
         match_end_time   = date_trunc('second', NOW() + ($1 || ' minutes')::interval)
     WHERE match_id = $2`,
-    [minutesToAdd, matchID]);
+    [minutesToAdd, matchID]); //Update the specific match details for match start : 13:00 -> 13:05 for a 5 minute game
 
-  res.json({ match_started: true });
+  res.json({ match_started: true }); //Return match started
   })
 
   app.get("/api/getMatchFinished", async (req, res)=>
     {
-      const matchID = req.query.matchID;
+      const matchID = req.query.matchID; //obtain match id from query parameters
       const result = await pool.query(
-        `SELECT * FROM "Match" WHERE match_id = $1 AND NOW() >= match_end_time`,
+        `SELECT * FROM "Match" WHERE match_id = $1 AND NOW() >= match_end_time`, //Return whether the match finished
         [matchID]
       );
 
       if (result.rows.length > 0) {
-        res.json({ match_finished: true });
+        res.json({ match_finished: true }); //If there is a match that is finished, return true
       }
       else
         {
-          res.json({ match_finished: false });
+          res.json({ match_finished: false }); //If there is no match that is finished, return false
         }
     });
-app.get("/api/getMatchEndTime", async (req, res) => {
-  const matchID = req.query.matchID;
-const result = await pool.query(
-      `SELECT match_end_time AT TIME ZONE 'UTC' AS match_end_time 
-       FROM "Match" 
-       WHERE match_id = $1`,
-      [matchID]
-    )
+app.get("/api/getMatchEndTime", async (req, res) => { //GET request to get MATCHend time
+  const matchID = req.query.matchID; //obtain match id from query parameters
+  const result = await pool.query(
+    `SELECT match_end_time FROM "Match" WHERE match_id = $1`, //query match_end_time for a specific match
+    [matchID]
+  );
 
   if (result.rows.length > 0) {
-    res.json({ match_end_time: result.rows[0].match_end_time });
+    res.json({ match_end_time: result.rows[0].match_end_time });// return match end time to frontend
   } else {
     res.status(404).json({ error: "Match not found" });
   }
 });
 app.post("/api/hitplayer", async (req, res)=>
   {
-    const {playerID,matchID,playershotid} = req.body
+    const {playerID,matchID,playershotid} = req.body //variables from body
     try
     {
-      var result = await pool.query('SELECT player_health FROM "Player" WHERE user_id = $1 AND match_id = $2',[playershotid,matchID]);
-      const playerShotHealth = result.rows[0].player_health;
-      result = await pool.query('SELECT player_score FROM "Player" WHERE user_id = $1 AND match_id = $2',[playerID,matchID]);
-      const playerScore = result.rows[0].player_health;
-      const value = 10;
-      if( playerShotHealth >10)
+      var result = await pool.query('SELECT player_health FROM "Player" WHERE user_id = $1 AND match_id = $2',[playershotid,matchID]); //Select health for player that is shot
+      const playerShotHealth = result.rows[0].player_health; //Keep health for player that is shot
+      result = await pool.query('SELECT player_score FROM "Player" WHERE user_id = $1 AND match_id = $2',[playerID,matchID]); //Select score for player that shot 
+      const playerScore = result.rows[0].player_score; //Keep score for player that shot
+      const value = 10; //Damage 
+      if( playerShotHealth >value) //If Player who was shot has more than the value valued health //Which is a hit 
       {
         //Player shot
-        result = await pool.query('UPDATE "Player" SET player_health = $3 WHERE user_id = $1 AND  match_id = $2',[playershotid,matchID,playerShotHealth-value])
+        result = await pool.query('UPDATE "Player" SET player_health = $3 WHERE user_id = $1 AND  match_id = $2',[playershotid,matchID,playerShotHealth-value]) //Decrease shot player health by damage
         
-        result = await pool.query('INSERT INTO "MatchAction"(match_id,user_id,action_type,action_2nd_player,action_type_value) VALUES ($1,$2,$5,$3,$4)',[matchID,playerID,playershotid,value,"hit"])
-        result = await pool.query('UPDATE "Player" SET player_score = $3 WHERE user_id = $1 AND  match_id = $2',[playerID,matchID,playerScore+value])
+        result = await pool.query('INSERT INTO "MatchAction"(match_id,user_id,action_type,action_2nd_player,action_type_value) VALUES ($1,$2,"hit",$3,$4)',[matchID,playerID,playershotid,value]) //Add hit to MatchAction
+        result = await pool.query('UPDATE "Player" SET player_score = $3 WHERE user_id = $1 AND  match_id = $2',[playerID,matchID,playerScore+value]) //Increase player score by value
 
 
       }else
-      { //Player 'killed'
+      { //Player shot 'killed'
         //Add hit to playeractions
-        result = await pool.query('UPDATE "Player" SET player_health = $3 WHERE user_id = $1 AND  match_id = $2',[playershotid,matchID,0])
-        result = await pool.query('INSERT INTO "MatchAction"(match_id,user_id,action_type,action_2nd_player,action_type_value) VALUES ($1,$2,$5,$3,$4)',[matchID,playerID,playershotid,value,"hit"])
-        result = await pool.query('INSERT INTO "MatchAction"(match_id,user_id,action_type,action_2nd_player,action_type_value) VALUES ($1,$2,$5,$3,$4)',[matchID,playerID,playershotid,null,"kill"])
-        result = await pool.query('UPDATE "Player" SET player_score = $3 WHERE user_id = $1 AND  match_id = $2',[playerID,matchID,playerScore+value])
+        result = await pool.query('UPDATE "Player" SET player_health = $3 WHERE user_id = $1 AND  match_id = $2',[playershotid,matchID,0]) //Set player shot health to 0
+        result = await pool.query('INSERT INTO "MatchAction"(match_id,user_id,action_type,action_2nd_player,action_type_value) VALUES ($1,$2,"hit",$3,$4)',[matchID,playerID,playershotid,value]) //Register hit
+        result = await pool.query('INSERT INTO "MatchAction"(match_id,user_id,action_type,action_2nd_player,action_type_value) VALUES ($1,$2,"kill",$3,$4)',[matchID,playerID,playershotid,null]) //Register kill
+        result = await pool.query('UPDATE "Player" SET player_score = $3 WHERE user_id = $1 AND  match_id = $2',[playerID,matchID,playerScore+value]) //Increase player score by value
       }
     } 
     catch(err)
     {
-
+      console.error(err)
     }
   })
 
-app.get("/api/getStatistics", async (req, res) => {
-  const matchID = req.query.matchID;
+app.get("/api/getStatistics", async (req, res) => { //GET request to obtain all player statistics for a match
+  const matchID = req.query.matchID; //obtain match id from query parameters
 
   try {
     const result = await pool.query(
       'SELECT user_id FROM "Player" WHERE match_id = $1',
       [matchID]
-    );
+    ); //select all user ids
 
     const Players = await Promise.all(
       result.rows.map(async (row) => {
@@ -347,34 +340,34 @@ app.get("/api/getStatistics", async (req, res) => {
           kills: 0,
           score: 0,
           alive:true
-        };
+        };//Instantiate a array of values which has username, kills,score and alive status for each player
 
-      const resUsername = await pool.query('SELECT "UserUsername" FROM "User" where "UserID" = $1',[row.user_id]);
-      player.username = resUsername.rows[0].UserUsername;
+      const resUsername = await pool.query('SELECT "UserUsername" FROM "User" where "UserID" = $1',[row.user_id]); //Get username for current player
+      player.username = resUsername.rows[0].UserUsername; //Set username for current player
 
         const resKills = await pool.query(
-          'SELECT COUNT(*) AS "Kills" FROM "MatchAction" WHERE match_id = $1 AND user_id = $2 AND action_type = $3',
-          [matchID, row.user_id, "kill"]
+          'SELECT COUNT(*) AS "Kills" FROM "MatchAction" WHERE match_id = $1 AND user_id = $2 AND action_type = $3', //Get kills for current player
+          [matchID, row.user_id, "kill"] 
         );
-        player.kills = Number(resKills.rows[0].Kills);
-
+        player.kills = Number(resKills.rows[0].Kills); //Set kills for current player
+ 
         const resScore = await pool.query(
-          'SELECT player_score FROM "Player" WHERE match_id = $1 AND user_id = $2',
+          'SELECT player_score FROM "Player" WHERE match_id = $1 AND user_id = $2', //Get score for current player
           [matchID, row.user_id]
         );
-        player.score = Number(resScore.rows[0].player_score);
+        player.score = Number(resScore.rows[0].player_score); //Set score for current player
 
         const resAlive = await pool.query(
-          'SELECT (COUNT(*)=0) AS "Alive" FROM "MatchAction" WHERE match_id = $1 AND action_2nd_player = $2 AND action_type = $3',
+          'SELECT (COUNT(*)=0) AS "Alive" FROM "MatchAction" WHERE match_id = $1 AND action_2nd_player = $2 AND action_type = $3', //Get alive status for current player
           [matchID, row.user_id,"kill"]
         );
-        player.alive = resAlive.rows[0].Alive;
+        player.alive = resAlive.rows[0].Alive; //Set alive status for current player
 
-        return player;
+        return player; //Return this player to players
       })
     );
 
-    res.json(Players);
+    res.json(Players); //Return all players to frontend
   } catch (err) {
     console.error(err);
     res.status(500).send("Database error");
