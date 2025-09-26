@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "node index.js",
-    "build": "echo 'No build step defined'"
+    "build": "echo 'No build step defined'",
+    "start": "node index.js"
   },
   "dependencies": {
     "@tensorflow/tfjs-backend-webgl": "^4.22.0",
