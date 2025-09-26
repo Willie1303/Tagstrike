@@ -1,6 +1,12 @@
-{ "private": true,
+{
+  "name": "my-project",
+  "private": true,
   "scripts": {
-    "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\""
+    "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+    "build": "npm run build --prefix frontend",
+    "start": "npm run start --prefix backend"
   },
-  "dependencies": { "@tensorflow/tfjs-backend-webgl": "^4.22.0", "opencv.js": "^1.2.1" } 
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  }
 }
