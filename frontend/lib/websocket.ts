@@ -12,7 +12,7 @@ export class WebSocketClient {
   public id="";
   constructor() {
     //TODO CHANGE THE URL for server socket
-    this.socket = io("https://lasertag.onrender.com/", {
+    this.socket = io("https://tagstrike.onrender.com/", {
       transports: ["websocket"], // optional, can fallback to polling if you remove this
     });
 
