@@ -12,13 +12,13 @@ export class WebSocketClient {
   public id="";
   constructor() {
     //TODO CHANGE THE URL for server socket
-    //this.socket = io("https://lasertag.onrender.com/", {
-      //transports: ["websocket"], // optional, can fallback to polling if you remove this
-    //});
-
-    this.socket = io("http://localhost:5000", {
-       transports: ["websocket"], // optional, can fallback to polling if you remove this
+    this.socket = io("https://lasertag.onrender.com/", {
+      transports: ["websocket"], // optional, can fallback to polling if you remove this
     });
+
+    //this.socket = io("http://localhost:5000", {
+       //transports: ["websocket"], // optional, can fallback to polling if you remove this
+    //});
 
 
     this.socket.on("connect", () => {
