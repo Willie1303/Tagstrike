@@ -88,7 +88,7 @@ export function createNewServer(httpServer:HTTPServer){
         SocketData
     >(httpServer, {
       cors:{
-        origin:"http://localhost:5000",
+        origin:"*",
         methods: ["GET", "POST"]
       }
     });
